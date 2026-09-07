@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chapter 01 — Your first two tricks</title>
+    <link rel="stylesheet" href="lesson.css" />
+  </head>
+  <body>
+    <a class="back" href="index.html">&#9664; All chapters</a>
+    <header>
+      <h1>Chapter 01 &middot; Your first two tricks</h1>
+      <p class="sub">Four little tricks. One number at a time.</p>
+    </header>
+
+    <nav data-part="ladder" aria-label="Chapters">
+      <ol>
+        <li>00 Hello!</li>
+        <li class="here">01 First tricks</li>
+        <li>02 Pairs</li>
+        <li>03 Funny patterns</li>
+        <li>04 Deep logic</li>
+        <li>05 The map</li>
+      </ol>
+    </nav>
+
+    <section data-part="learn">
+      <h2>What you will learn</h2>
+      <p>
+        You know the rules of Sudoku. This chapter gives you four little
+        tricks. Each trick finds one number. Then you write the number in.
+        These tricks carry you through whole easy boards. Champions use them
+        too. They are just faster.
+      </p>
+    </section>
+
+    <section data-part="body">
+      <section data-technique="crosshatching">
+        <h2>Trick 1: Cross-hatching</h2>
+        <p>
+          Pick a number. Let us pick 5. Find every 5 on the board. Now choose
+          one box. A row with a 5 is blocked. A column with a 5 is blocked
+          too. Blocked lines cross out squares inside the box. Sometimes just
+          one square stays free. That square gets the 5.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000500000000000000050000000000000500000000000000000000000000005000000000000"
+            data-hl="9,25,39,68"
+            data-hx="3,5,12,13,14,21,22,23"
+            role="img"
+            aria-label="A board with four highlighted 5s and red crosses on blocked squares of the top middle box"
+          ></div>
+          <figcaption>
+            A teaching snippet, not a full puzzle. Four 5s sit on the board.
+            The red crosses are blocked squares.
+          </figcaption>
+        </figure>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000050000500000000000000050000000000000500000000000000000000000000005000000000000"
+            data-hl="4"
+            role="img"
+            aria-label="The same board with a 5 placed in the one free square of the top middle box"
+          ></div>
+          <figcaption>
+            Only one square stayed free. The 5 goes there.
+          </figcaption>
+        </figure>
+        <aside class="grownups">
+          <p>
+            Grown-ups: cross-hatching scans the rows and columns that already
+            contain a digit; their intersections block cells in a box until a
+            single placement remains. It is the by-hand way to find a hidden
+            single (SudokuWiki / HoDoKu, Brief Tier 1).
+          </p>
+        </aside>
+      </section>
+
+      <section data-technique="full_house">
+        <h2>Trick 2: Full house</h2>
+        <p>
+          Look at one row. Eight numbers are already there. One number is
+          missing. You know it instantly. Write it in. This works for a
+          column. It works for a box too.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-givens="12345678.456789123789123456234567891567891234891234567345678912678912345912345678"
+            data-hl="8"
+            role="img"
+            aria-label="A nearly complete board where the first row misses exactly one number"
+          ></div>
+          <figcaption>The first row misses just one number.</figcaption>
+        </figure>
+        <aside class="grownups">
+          <p>
+            Grown-ups: a full house is any unit — row, column, or box — with a
+            single empty cell; the missing digit is forced. It is the friendly
+            corner case of the single family (Brief Tier 1).
+          </p>
+        </aside>
+      </section>
+
+      <section data-technique="hidden_single">
+        <h2>Trick 3: Hidden single</h2>
+        <p>
+          Pick a number again. Say 7. Look at one box. Where can the 7 go?
+          Rows and columns with a 7 say no. If one square says yes, the 7
+          lives there. It was hiding. You found it.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000000070000007000000000000000000000070000000000000000007000000000000000000"
+            data-hl="13,20,43,62"
+            data-hx="7,8,15,16,17,24,25,26"
+            role="img"
+            aria-label="A board with four highlighted 7s and red crosses blocking the top right box except one square"
+          ></div>
+          <figcaption>
+            A teaching snippet. Only one square in the top right box can hold
+            a 7.
+          </figcaption>
+        </figure>
+        <aside class="grownups">
+          <p>
+            Grown-ups: a hidden single is a digit restricted to exactly one
+            cell of a unit — a candidate that appears once. Cross-hatching is
+            the scanning method; this is the same find, seen from the digit
+            (Brief Tier 1).
+          </p>
+        </aside>
+      </section>
+
+      <section data-technique="naked_single">
+        <h2>Trick 4: Naked single</h2>
+        <p>
+          Now look at one empty square. Ask: which numbers fit here? The row
+          already holds eight numbers. So only one number fits. That number
+          goes in.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000000000000000000000000000000012345678000000000000000000000000000000000000"
+            data-hl="45"
+            role="img"
+            aria-label="A board where one row holds the digits 1 to 8 and one empty square is highlighted"
+          ></div>
+          <figcaption>
+            A teaching snippet. This square sees 1 to 8 in its row. Only 9
+            fits.
+          </figcaption>
+        </figure>
+        <aside class="grownups">
+          <p>
+            Grown-ups: a naked single is a cell whose candidate list holds
+            exactly one digit. Here the row alone fixes it; rows, columns and
+            boxes can each do the job (Brief Tier 1).
+          </p>
+        </aside>
+      </section>
+
+      <section data-technique="practice">
+        <h2>Practice on real boards</h2>
+        <p>
+          Now try real boards. These come from the game itself. Each has one
+          solution. Find all the 7s first.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-givens="700400009514609030069070401080006910000890000001250008050140720308567190000003865"
+            role="img"
+            aria-label="A real easy Sudoku board with four 7s among the given digits"
+          ></div>
+          <figcaption>A real easy board. Where do the other 7s go?</figcaption>
+        </figure>
+        <figure>
+          <div
+            class="board"
+            data-givens="068005070010279806097006230080000597005080000002000408104058620806310009009760105"
+            role="img"
+            aria-label="A real easy Sudoku board with five 7s among the given digits"
+          ></div>
+          <figcaption>Another real board. Hunt the 7s again.</figcaption>
+        </figure>
+        <aside class="grownups">
+          <p>
+            Grown-ups: both positions come straight from the game engine and
+            are gate-verified to have exactly one solution — safe to reason
+            over with the four singles tricks.
+          </p>
+        </aside>
+      </section>
+    </section>
+
+    <section data-part="try">
+      <h2>Try it in the game</h2>
+      <p>
+        Time to play for real. <a href="../sudoku.html">Open the game.</a>
+        Choose Easy. Press New game. Your first hunt: find every 7. Use
+        cross-hatching on each box. Then hunt full houses.
+      </p>
+    </section>
+
+    <section data-part="checkpoint">
+      <h2>Checkpoint</h2>
+      <p>Can you do these three things?</p>
+      <ol>
+        <li>Find a hiding 5 inside a box.</li>
+        <li>Fill a row that misses one number.</li>
+        <li>Say which trick you just used.</li>
+      </ol>
+      <p>
+        You are ready when all three feel easy. Your goal: solve one easy
+        board by yourself.
+      </p>
+    </section>
+
+    <footer data-part="footer">
+      <p>
+        Chapter 00 is coming soon. <a href="index.html">All chapters</a>.
+        Chapter 02 is coming soon. <a href="../sudoku.html">Play the game</a>.
+      </p>
+    </footer>
+
+    <script src="board.js"></script>
+  </body>
+</html>

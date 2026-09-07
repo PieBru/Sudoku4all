@@ -17,6 +17,12 @@ from playwright.sync_api import sync_playwright
 BASE = Path(__file__).resolve().parents[1]
 LESSONS = BASE / "lessons"
 REQUIRED_PARTS = ["ladder", "learn", "body", "try", "checkpoint", "footer"]
+PAGE_RULES = {
+    "01-beginner.html": {
+        "techniques": ["crosshatching", "full_house", "hidden_single", "naked_single"],
+        "full_boards_min": 2,
+    }
+}
 fails = []
 
 
@@ -95,6 +101,7 @@ class Collector(HTMLParser):
         self.boards = []  # (class string, attrs dict)
         self.hrefs = []
         self.parts = []
+        self.techniques = []
         self.chapter_rows = 0
 
     def handle_starttag(self, tag, attrs):
@@ -105,6 +112,8 @@ class Collector(HTMLParser):
             self.hrefs.append(a["href"])
         if "data-part" in a:
             self.parts.append(a["data-part"])
+        if "data-technique" in a:
+            self.techniques.append(a["data-technique"])
         if tag == "li" and "data-chapter" in a:
             self.chapter_rows += 1
 
@@ -132,6 +141,20 @@ for page in pages:
     if re.match(r"\d\d-", page.name):
         missing = [p for p in REQUIRED_PARTS if p not in c.parts]
         check(f"template parts [{page.name}]", not missing, f"missing={missing}")
+        rule = PAGE_RULES.get(page.name)
+        if rule:
+            tmiss = [t for t in rule["techniques"] if t not in c.techniques]
+            check(
+                f"technique sections [{page.name}]",
+                not tmiss,
+                f"missing={tmiss}",
+            )
+            full = sum(1 for _, a in c.boards if "data-fragment" not in a)
+            check(
+                f"full-position boards >= {rule['full_boards_min']} [{page.name}]",
+                full >= rule["full_boards_min"],
+                f"full={full}",
+            )
     for cls, a in c.boards:
         if "mini" in cls:
             size = int(a.get("data-size", "0") or "0")
@@ -151,11 +174,18 @@ for page in pages:
             if ch.isdigit() and ch != "0"
         }
         ok, nsol = count_solutions(cells, size, brows, bcols)
-        check(
-            f"board data valid [{page.name}] size={size}",
-            ok and nsol == 1,
-            f"consistent={ok} solutions={nsol}",
-        )
+        if "data-fragment" in a:
+            check(
+                f"fragment consistent [{page.name}]",
+                ok,
+                f"conflict-free (solutions={nsol})",
+            )
+        else:
+            check(
+                f"board data valid [{page.name}] size={size}",
+                ok and nsol == 1,
+                f"consistent={ok} solutions={nsol}",
+            )
 
 idx = LESSONS / "index.html"
 if idx.exists():

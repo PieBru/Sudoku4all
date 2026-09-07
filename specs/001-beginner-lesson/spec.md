@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal.md §3 (chapter 01 row), §4 (L1, L2, L6), §5 (row `001-beginner-lesson`), §5.1, §7, Appendix A, Appendix B
 
