@@ -70,6 +70,8 @@ The player wants paper practice: they tick *include solution*, press Print, and 
 - **Unchecking a whole level**: legitimate and documented in the panel — it trains the levels below at that level's carve depth (proposal §6.1).
 - **Generate pressed with no game in progress**: no confirm dialog; straight to generation.
 - **Generation failure mid-flow**: previous game stays intact unless the player confirmed replacement first; the failure announcement carries the actionable message (spec 010's text) and a real retry path (press Generate again).
+- **Print before any training generation**: the print view reflects the *active* board (training or casual); the optional solution page uses that board's solution — printing is never tied to a stale generated result.
+- **Page busy during generation**: the generator may busy the page up to its wall-clock cap (≤ 5 s, spec 010 FR-004); Generate cannot re-enter while a run is in flight.
 - **Advanced level press**: does nothing but explain (disabled + reason), including keyboard users (`aria-disabled`).
 
 ## Requirements *(mandatory)*
@@ -80,10 +82,10 @@ The player wants paper practice: they tick *include solution*, press Print, and 
 - **FR-002**: The level selector MUST offer Beginner / Basic / Intermediate as segmented buttons plus Advanced visibly disabled with its stated reason (tooltip + `aria-disabled`); selecting a level shows exactly the technique groups ≤ that level, pre-checked per §4 with saved unchecks winning.
 - **FR-003**: The checklist MUST implement Appendix A exactly: 19 boxes with player-facing labels, keyed by stable snake_case IDs; the two Beginner singles MUST be locked on with a one-line explanation; techniques ahead of the level are never displayed.
 - **FR-004**: All / None buttons MUST toggle only the currently selected level's group and MUST be disabled at Beginner.
-- **FR-005**: Generate MUST call spec 010's generator with the current checked set, ask for confirmation when a game is in progress (the New game confirm convention), adopt the resulting board as the active game on success (solution hidden; undo/notes/hints/mistakes all functional — decision 12), and show the one-line solve-path report honestly labeled as the solver's own cheapest-first path.
-- **FR-006**: All progress and failure messages MUST be announced through the app's `aria-live` status div; failures MUST state why + what to do and offer retry; no silent states.
+- **FR-005**: Generate MUST call spec 010's generator with the current checked set, ask for confirmation under the app's own condition (started and not won — sudoku.html:1179), adopt the resulting board as the active game on success by resetting the full game state exactly like `newGame()` does (sudoku.html:1110-1125: notes, selection, mistakes, hints, elapsed, pause, won) with the solution hidden and undo/notes/hints/mistakes all functional (decision 12), and show the one-line solve-path report honestly labeled as the solver's own cheapest-first path.
+- **FR-006**: The run MUST be announced before it starts ("Building your board…") and its outcome on completion, both through the app's `aria-live` status div; failures MUST state why + what to do and offer retry; no silent states. (Mid-run progress updates are optional — the generator may busy the page up to its wall-clock cap, spec 010 FR-004.)
 - **FR-007**: Preferences MUST persist under `sudoku-training-v1` per Appendix B's commented schema (level + per-level unchecked IDs, stable IDs only, additive-only, unknown fields ignored, corrupt/older saves fall back to defaults loudly in the status line), saved on every change, restored on open; the key MUST NOT touch `sudoku-v1`, `sudoku-stats-v1`, or `sudoku-theme-v1`.
-- **FR-008**: A Print control MUST produce browser-native output via `@media print` CSS + `window.print()`: the grid on one page, the solved grid on a second page only when *include solution* is checked; no export code paths beyond CSS.
+- **FR-008**: A Print control MUST produce browser-native output via `@media print` CSS + `window.print()`: the grid on one page (the active board's current entries — givens and placed digits — never on-screen notes), the solved grid on a second page only when *include solution* is checked; no export code paths beyond CSS.
 - **FR-009**: The casual game MUST remain untouched: existing `tests/engine.test.mjs` and the existing `tests/browser.test.py` sections stay green; only additive changes to the app.
 
 ### Key Entities
