@@ -241,21 +241,27 @@ with sync_playwright() as p:
     boxes = tp.locator("#trainChecks input[type=checkbox]")
     locked = tp.locator("#trainChecks input[type=checkbox]:disabled")
     check("Basic default shows 10 boxes", boxes.count() == 10, f"got {boxes.count()}")
-    check("two singles locked on", locked.count() == 2 and all(
-        locked.nth(i).is_checked() for i in range(2)
-    ), f"locked={locked.count()}")
+    check(
+        "two singles locked on",
+        locked.count() == 2 and all(locked.nth(i).is_checked() for i in range(2)),
+        f"locked={locked.count()}",
+    )
     # switch to Intermediate: 19 boxes, default all-checked
     tp.click('#trainLevels button[data-level="intermediate"]')
     tp.wait_for_timeout(100)
     ib = tp.locator("#trainChecks input[type=checkbox]")
     ic = tp.locator("#trainChecks input[type=checkbox]:checked")
     check("Intermediate shows 19 boxes", ib.count() == 19, f"got {ib.count()}")
-    check("Intermediate defaults all-checked", ic.count() == 19, f"checked {ic.count()}")
+    check(
+        "Intermediate defaults all-checked", ic.count() == 19, f"checked {ic.count()}"
+    )
     # switch back to Basic: saved unchecks win (none saved -> all 10 checked)
     tp.click('#trainLevels button[data-level="basic"]')
     tp.wait_for_timeout(100)
     bc = tp.locator("#trainChecks input[type=checkbox]:checked")
-    check("Basic after roundtrip all-checked", bc.count() == 10, f"checked {bc.count()}")
+    check(
+        "Basic after roundtrip all-checked", bc.count() == 10, f"checked {bc.count()}"
+    )
     # uncheck naked_quad + reload -> persistence, saved unchecks win
     tp.locator('#trainChecks input[data-id="naked_quad"]').uncheck()
     tp.wait_for_timeout(100)
@@ -268,8 +274,11 @@ with sync_playwright() as p:
     tp.wait_for_timeout(100)
     still = tp.locator("#trainChecks input[data-id=naked_quad]")
     checked_ct = tp.locator("#trainChecks input[type=checkbox]:checked").count()
-    check("uncheck persists over reload", not still.is_checked() and checked_ct == 9,
-          f"checked {checked_ct}")
+    check(
+        "uncheck persists over reload",
+        not still.is_checked() and checked_ct == 9,
+        f"checked {checked_ct}",
+    )
     # keys isolated: toggling prefs never touched the game save
     tp.evaluate("localStorage.setItem('sudoku-v1', 'MARKER')")
     tp.click('#trainLevels button[data-level="beginner"]')
@@ -277,14 +286,19 @@ with sync_playwright() as p:
     v1 = tp.evaluate("localStorage.getItem('sudoku-v1')")
     check("sudoku-v1 untouched by pref toggles", v1 == "MARKER", str(v1))
     # Beginner: All/None disabled, no group checkboxes
-    check("Beginner disables All/None", tp.locator("#trainAll").is_disabled()
-          and tp.locator("#trainNone").is_disabled(), "")
+    check(
+        "Beginner disables All/None",
+        tp.locator("#trainAll").is_disabled()
+        and tp.locator("#trainNone").is_disabled(),
+        "",
+    )
     # generate on Beginner (no game in progress -> no confirm);
     # record every live-region text so the transient announcement is captured
     tp.evaluate(
         "window.__liveLog = []; new MutationObserver(() => "
         "window.__liveLog.push(document.getElementById('live').textContent)"
-        ").observe(document.getElementById('live'), {childList: true, characterData: true, subtree: true})")
+        ").observe(document.getElementById('live'), {childList: true, characterData: true, subtree: true})"
+    )
     tp.click("#trainGen")
     tp.wait_for_function(
         "!document.getElementById('live').textContent.includes('Building')",
@@ -292,28 +306,41 @@ with sync_playwright() as p:
     )
     rep = tp.evaluate("document.getElementById('live').textContent")
     log = tp.evaluate("window.__liveLog")
-    check("Building announcement lands",
-          any("Building your board" in t for t in log), str(log[:4]))
-    check("report uses honest prefix", "Solve path (easiest techniques first):" in rep, rep)
-    givens = tp.evaluate(
-        "document.querySelectorAll('#grid .cell.given').length")
+    check(
+        "Building announcement lands",
+        any("Building your board" in t for t in log),
+        str(log[:4]),
+    )
+    check(
+        "report uses honest prefix",
+        "Solve path (easiest techniques first):" in rep,
+        rep,
+    )
+    givens = tp.evaluate("document.querySelectorAll('#grid .cell.given').length")
     digits = tp.evaluate(
-        "[...document.querySelectorAll('#grid .cell')].filter(c => /[1-9]/.test(c.textContent)).length")
+        "[...document.querySelectorAll('#grid .cell')].filter(c => /[1-9]/.test(c.textContent)).length"
+    )
     label = tp.evaluate("document.getElementById('difflabel').textContent")
-    check("board adopted: clues only, Training label",
-          37 <= givens <= 42 and digits == givens and "Training" in label,
-          f"givens={givens} digits={digits} label={label}")
+    check(
+        "board adopted: clues only, Training label",
+        37 <= givens <= 42 and digits == givens and "Training" in label,
+        f"givens={givens} digits={digits} label={label}",
+    )
     check("training page has zero errors", not terror, f"errors={terror[:2]}")
     # generate with game in progress -> confirm respected
     tp.evaluate(
-        "document.querySelector('#grid .cell:not(.given)').dispatchEvent(new Event('click', {bubbles: true}))")
+        "document.querySelector('#grid .cell:not(.given)').dispatchEvent(new Event('click', {bubbles: true}))"
+    )
     tp.evaluate("window.confirm = () => false")
     tp.click("#training summary")  # generator closes the panel on success
     tp.click("#trainGen")
     tp.wait_for_timeout(200)
     rep2 = tp.evaluate("document.getElementById('live').textContent")
-    check("declined confirm leaves game untouched",
-          rep2 == rep or "Building" in rep2, rep2)
+    check(
+        "declined confirm leaves game untouched",
+        rep2 == rep or "Building" in rep2,
+        rep2,
+    )
     # corrupt save -> loud reset to defaults
     tp.close()
     cp = ctx.new_page()
@@ -324,24 +351,34 @@ with sync_playwright() as p:
     cp2.goto(URL)
     cp2.wait_for_timeout(400)
     note = cp2.evaluate("document.getElementById('live').textContent")
-    check("corrupt prefs fall back loudly", "Training preferences were reset" in note, note)
+    check(
+        "corrupt prefs fall back loudly",
+        "Training preferences were reset" in note,
+        note,
+    )
     cp2.click("#menu summary")
     cp2.click("#training summary")
     cp2.wait_for_timeout(100)
     lv = cp2.evaluate(
-        'document.querySelector("#trainLevels button[aria-pressed=\'true\']").dataset.level')
+        "document.querySelector(\"#trainLevels button[aria-pressed='true']\").dataset.level"
+    )
     cct = cp2.locator("#trainChecks input[type=checkbox]:checked").count()
-    check("corrupt prefs restored defaults", lv == "basic" and cct == 10,
-          f"level={lv} checked={cct}")
+    check(
+        "corrupt prefs restored defaults",
+        lv == "basic" and cct == 10,
+        f"level={lv} checked={cct}",
+    )
     # print view: without and with solution, under print media
     cp2.click("#trainPrint")  # build the view under screen media (button visible)
     cp2.wait_for_timeout(200)
     cp2.emulate_media(media="print")
-    vis = cp2.evaluate(
-        "getComputedStyle(document.getElementById('printView')).display")
+    vis = cp2.evaluate("getComputedStyle(document.getElementById('printView')).display")
     grids = cp2.locator("#printView .pgrid").count()
-    check("print media shows printView, one grid", vis == "block" and grids == 1,
-          f"display={vis} grids={grids}")
+    check(
+        "print media shows printView, one grid",
+        vis == "block" and grids == 1,
+        f"display={vis} grids={grids}",
+    )
     cp2.emulate_media(media="screen")
     cp2.locator("#trainSol").check()
     cp2.click("#trainPrint")
@@ -352,10 +389,14 @@ with sync_playwright() as p:
         " const ne = gs.map(g => [...g.children].filter(c => /[1-9]/.test(c.textContent)).length);"
         " const ok = gs.length === 2 && gs.every(g => g.children.length === 81)"
         "   && ne[0] >= 25 && ne[1] === 81 && gs[1].closest('.psol') !== null;"
-        " return {ok, ne}; }")
-    check("include-solution adds solved second page", g2 == 2 and full, f"grids={g2} full={full}")
-    scr = cp2.evaluate(
-        "getComputedStyle(document.getElementById('printView')).display")
+        " return {ok, ne}; }"
+    )
+    check(
+        "include-solution adds solved second page",
+        g2 == 2 and full,
+        f"grids={g2} full={full}",
+    )
+    scr = cp2.evaluate("getComputedStyle(document.getElementById('printView')).display")
     check("printView hidden on screen", scr == "none", scr)
     cp2.close()
 
