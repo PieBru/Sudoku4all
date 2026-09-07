@@ -183,17 +183,41 @@ console.log("budget exhaustion: exact message, no board returned");
    abort loudly with no retry (planted at test time, then restored) */
 {
   const real = trainDetectors.pointing;
-  trainDetectors.pointing = () => ({ place: [0, 9] }); /* always place 9 at r1c1 */
-  let tripped = null;
-  try { generateTrainingBoard([...SINGLES, ...BASIC], 34); }
-  catch (e) { tripped = e.message; }
+  /* unsound plant: find two bi-value cells in one unit and kill one digit of
+     one of them — the pair then swaps values, completing to a WRONG grid */
+  trainDetectors.pointing = (cand) => {
+    for (let i = 0; i < 81; i++) {
+      if (!cand[i]) continue;
+      const ci = cand[i];
+      if (ci & (ci - 1)) continue; /* not bi-value */
+      for (const j of GROUPS[i]) {
+        const cj = cand[j];
+        if (cj === ci && j > i) return { elims: [[i, ci]] };
+      }
+    }
+    return null;
+  };
+  let trips = 0, cleanReturns = 0, budgetThrows = 0;
+  for (let k = 0; k < 6; k++) {
+    try {
+      const r = generateTrainingBoard([...SINGLES, ...BASIC], 34);
+      /* any return under an unsound detector must still be a correct board */
+      const cnt = countSolutions(r.board, 2);
+      assert.ok(cnt === 1 && r.board.every((v, i) => v === r.solution[i] || r.given[i]),
+        "tripwire: unsound plant returned a corrupted board");
+      cleanReturns++;
+    } catch (e) {
+      if (/tripwire/.test(e.message)) trips++;
+      else if (/Try enabling/.test(e.message)) budgetThrows++;
+      else throw e;
+    }
+  }
   trainDetectors.pointing = real;
-  assert.ok(tripped !== null, "tripwire: unsound detector must abort");
-  assert.ok(/tripwire/.test(tripped), `tripwire message wrong: ${tripped}`);
+  assert.ok(trips >= 1, `tripwire never fired (trips=${trips}, clean=${cleanReturns}, budget=${budgetThrows})`);
   /* and after restore, generation works again (no retry state leaked) */
   const ok = generateTrainingBoard([...SINGLES, ...BASIC], 34);
   assert.ok(ok.clues <= 34);
-  console.log("tripwire: unsound detector aborted loudly, restore clean");
+  console.log(`tripwire: fired ${trips}/6 unsound runs, aborted loudly, restore clean`);
 }
 
 console.log("training tests: all pass");

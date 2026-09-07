@@ -214,6 +214,151 @@ with sync_playwright() as p:
     )
     lp.close()
 
+    # ===== spec 011: Training studio =====
+    tp = ctx.new_page()
+    terror = []
+    tp.on("pageerror", lambda e, sink=terror: sink.append(str(e)))
+    tp.goto(URL)
+    tp.wait_for_timeout(300)
+    tp.click("#menu summary")
+    tp.click("#training summary")
+    tp.wait_for_timeout(100)
+    check(
+        "training panel boots, zero errors",
+        tp.locator("#trainGen").is_visible() and not terror,
+        f"errors={terror[:2]}",
+    )
+    adv = tp.locator('#trainLevels button[data-level="advanced"]')
+    check(
+        "Advanced disabled with exact reason",
+        adv.get_attribute("aria-disabled") == "true"
+        and adv.is_disabled()
+        and adv.get_attribute("title")
+        == "Chain techniques cannot be verified yet - coming in a future version.",
+        adv.get_attribute("title") or "no title",
+    )
+    # default level Basic: 10 boxes, two locked singles
+    boxes = tp.locator("#trainChecks input[type=checkbox]")
+    locked = tp.locator("#trainChecks input[type=checkbox]:disabled")
+    check("Basic default shows 10 boxes", boxes.count() == 10, f"got {boxes.count()}")
+    check("two singles locked on", locked.count() == 2 and all(
+        locked.nth(i).is_checked() for i in range(2)
+    ), f"locked={locked.count()}")
+    # switch to Intermediate: 19 boxes, default all-checked
+    tp.click('#trainLevels button[data-level="intermediate"]')
+    tp.wait_for_timeout(100)
+    ib = tp.locator("#trainChecks input[type=checkbox]")
+    ic = tp.locator("#trainChecks input[type=checkbox]:checked")
+    check("Intermediate shows 19 boxes", ib.count() == 19, f"got {ib.count()}")
+    check("Intermediate defaults all-checked", ic.count() == 19, f"checked {ic.count()}")
+    # switch back to Basic: saved unchecks win (none saved -> all 10 checked)
+    tp.click('#trainLevels button[data-level="basic"]')
+    tp.wait_for_timeout(100)
+    bc = tp.locator("#trainChecks input[type=checkbox]:checked")
+    check("Basic after roundtrip all-checked", bc.count() == 10, f"checked {bc.count()}")
+    # uncheck naked_quad + reload -> persistence, saved unchecks win
+    tp.locator('#trainChecks input[data-id="naked_quad"]').uncheck()
+    tp.wait_for_timeout(100)
+    saved = tp.evaluate("localStorage.getItem('sudoku-training-v1')")
+    check("prefs saved under sudoku-training-v1", '"naked_quad"' in saved, saved or "")
+    tp.reload()
+    tp.wait_for_timeout(300)
+    tp.click("#menu summary")
+    tp.click("#training summary")
+    tp.wait_for_timeout(100)
+    still = tp.locator("#trainChecks input[data-id=naked_quad]")
+    checked_ct = tp.locator("#trainChecks input[type=checkbox]:checked").count()
+    check("uncheck persists over reload", not still.is_checked() and checked_ct == 9,
+          f"checked {checked_ct}")
+    # keys isolated: toggling prefs never touched the game save
+    tp.evaluate("localStorage.setItem('sudoku-v1', 'MARKER')")
+    tp.click('#trainLevels button[data-level="beginner"]')
+    tp.wait_for_timeout(100)
+    v1 = tp.evaluate("localStorage.getItem('sudoku-v1')")
+    check("sudoku-v1 untouched by pref toggles", v1 == "MARKER", str(v1))
+    # Beginner: All/None disabled, no group checkboxes
+    check("Beginner disables All/None", tp.locator("#trainAll").is_disabled()
+          and tp.locator("#trainNone").is_disabled(), "")
+    # generate on Beginner (no game in progress -> no confirm);
+    # record every live-region text so the transient announcement is captured
+    tp.evaluate(
+        "window.__liveLog = []; new MutationObserver(() => "
+        "window.__liveLog.push(document.getElementById('live').textContent)"
+        ").observe(document.getElementById('live'), {childList: true, characterData: true, subtree: true})")
+    tp.click("#trainGen")
+    tp.wait_for_function(
+        "!document.getElementById('live').textContent.includes('Building')",
+        timeout=10000,
+    )
+    rep = tp.evaluate("document.getElementById('live').textContent")
+    log = tp.evaluate("window.__liveLog")
+    check("Building announcement lands",
+          any("Building your board" in t for t in log), str(log[:4]))
+    check("report uses honest prefix", "Solve path (easiest techniques first):" in rep, rep)
+    givens = tp.evaluate(
+        "document.querySelectorAll('#grid .cell.given').length")
+    digits = tp.evaluate(
+        "[...document.querySelectorAll('#grid .cell')].filter(c => /[1-9]/.test(c.textContent)).length")
+    label = tp.evaluate("document.getElementById('difflabel').textContent")
+    check("board adopted: clues only, Training label",
+          37 <= givens <= 42 and digits == givens and "Training" in label,
+          f"givens={givens} digits={digits} label={label}")
+    check("training page has zero errors", not terror, f"errors={terror[:2]}")
+    # generate with game in progress -> confirm respected
+    tp.evaluate(
+        "document.querySelector('#grid .cell:not(.given)').dispatchEvent(new Event('click', {bubbles: true}))")
+    tp.evaluate("window.confirm = () => false")
+    tp.click("#training summary")  # generator closes the panel on success
+    tp.click("#trainGen")
+    tp.wait_for_timeout(200)
+    rep2 = tp.evaluate("document.getElementById('live').textContent")
+    check("declined confirm leaves game untouched",
+          rep2 == rep or "Building" in rep2, rep2)
+    # corrupt save -> loud reset to defaults
+    tp.close()
+    cp = ctx.new_page()
+    cp.goto(URL)
+    cp.evaluate("localStorage.setItem('sudoku-training-v1', 'NOT-JSON{{{')")
+    cp.close(run_before_unload=False)
+    cp2 = ctx.new_page()
+    cp2.goto(URL)
+    cp2.wait_for_timeout(400)
+    note = cp2.evaluate("document.getElementById('live').textContent")
+    check("corrupt prefs fall back loudly", "Training preferences were reset" in note, note)
+    cp2.click("#menu summary")
+    cp2.click("#training summary")
+    cp2.wait_for_timeout(100)
+    lv = cp2.evaluate(
+        'document.querySelector("#trainLevels button[aria-pressed=\'true\']").dataset.level')
+    cct = cp2.locator("#trainChecks input[type=checkbox]:checked").count()
+    check("corrupt prefs restored defaults", lv == "basic" and cct == 10,
+          f"level={lv} checked={cct}")
+    # print view: without and with solution, under print media
+    cp2.click("#trainPrint")  # build the view under screen media (button visible)
+    cp2.wait_for_timeout(200)
+    cp2.emulate_media(media="print")
+    vis = cp2.evaluate(
+        "getComputedStyle(document.getElementById('printView')).display")
+    grids = cp2.locator("#printView .pgrid").count()
+    check("print media shows printView, one grid", vis == "block" and grids == 1,
+          f"display={vis} grids={grids}")
+    cp2.emulate_media(media="screen")
+    cp2.locator("#trainSol").check()
+    cp2.click("#trainPrint")
+    cp2.wait_for_timeout(200)
+    g2 = cp2.locator("#printView .pgrid").count()
+    full = cp2.evaluate(
+        "() => { const gs = [...document.querySelectorAll('#printView .pgrid')];"
+        " const ne = gs.map(g => [...g.children].filter(c => /[1-9]/.test(c.textContent)).length);"
+        " const ok = gs.length === 2 && gs.every(g => g.children.length === 81)"
+        "   && ne[0] >= 25 && ne[1] === 81 && gs[1].closest('.psol') !== null;"
+        " return {ok, ne}; }")
+    check("include-solution adds solved second page", g2 == 2 and full, f"grids={g2} full={full}")
+    scr = cp2.evaluate(
+        "getComputedStyle(document.getElementById('printView')).display")
+    check("printView hidden on screen", scr == "none", scr)
+    cp2.close()
+
     ctx.close()
     b.close()
 

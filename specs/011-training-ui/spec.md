@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal-training.md §1 (goal), §2 (directives), §4 (levels + checklist semantics), §6 (UI and output), §7 + Appendix B (persistence schema), §8 (Training UI gate), §9 decisions 2/3/5/8/10/11/12
 

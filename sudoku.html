@@ -385,6 +385,69 @@
       .pbtn.done {
         opacity: 0.35;
       }
+
+      /* Training studio (spec 011) */
+      #trainLevels button {
+        flex: 1;
+        padding: 6px 8px;
+      }
+      #trainLevels button[aria-pressed="true"] {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent) inset;
+      }
+      #trainChecks .grp {
+        margin: 8px 0 4px;
+        font-weight: 600;
+      }
+      #trainChecks label.chk {
+        display: inline-flex;
+        margin: 2px 12px 2px 0;
+      }
+      #trainChecks .lock {
+        color: var(--muted);
+        font-size: 0.85em;
+      }
+      #training .help {
+        color: var(--muted);
+        margin: 6px 0;
+      }
+      #printView {
+        display: none;
+      }
+      @media print {
+        body > *:not(#printView) {
+          display: none !important;
+        }
+        #printView {
+          display: block;
+        }
+        .ptitle {
+          font-size: 14pt;
+          margin: 0 0 8pt;
+        }
+        .pgrid {
+          display: grid;
+          grid-template-columns: repeat(9, 40pt);
+          border: 2pt solid #000;
+          width: max-content;
+        }
+        .pcell {
+          border: 0.5pt solid #000;
+          height: 40pt;
+          font-size: 20pt;
+          text-align: center;
+          line-height: 40pt;
+        }
+        .pcell.bR {
+          border-right-width: 2pt;
+        }
+        .pcell.bB {
+          border-bottom-width: 2pt;
+        }
+        .psol {
+          page-break-before: always;
+        }
+      }
     </style>
   </head>
   <body>
@@ -444,8 +507,39 @@
             System &rarr; Light &rarr; Dark.
           </p>
         </details>
+
+        <details id="training">
+          <summary>&#127891; Training studio</summary>
+          <p class="help">
+            Build a board that needs only the techniques you pick, and nothing
+            harder. Pick a level, untick anything you don't want to practice,
+            then press Build.
+          </p>
+          <div class="row" id="trainLevels" role="group" aria-label="Technique level">
+            <button type="button" data-level="beginner">Beginner</button
+            ><button type="button" data-level="basic">Basic</button
+            ><button type="button" data-level="intermediate">Intermediate</button
+            ><button type="button" data-level="advanced" aria-disabled="true" disabled></button>
+          </div>
+          <div id="trainChecks"></div>
+          <div class="row">
+            <button type="button" id="trainAll">&#9989; All</button
+            ><button type="button" id="trainNone">&#128683; None</button>
+          </div>
+          <div class="row">
+            <button type="button" id="trainGen">&#128296; Build board</button>
+          </div>
+          <div class="row">
+            <label class="chk"
+              ><input type="checkbox" id="trainSol" /> include solution in
+              print</label
+            ><button type="button" id="trainPrint">&#128424; Print</button>
+          </div>
+        </details>
       </div>
     </details>
+
+    <div id="printView" aria-hidden="true"></div>
 
     <div id="status">
       <span>&#9201; <b id="time">0:00</b></span>
@@ -1049,7 +1143,6 @@
         const nonSingles = allowedIds.filter(
           (t) => t !== "naked_single" && t !== "hidden_single",
         );
-        let lastErr = null;
         for (let attempt = 1; attempt <= C.attempts; attempt++) {
           if (Date.now() - t0 > C.wallMs)
             throw new Error(TRAIN_BUDGET_MSG + " (time budget)");
@@ -1083,7 +1176,7 @@
             const step = removable();
             if (!step) break;
           }
-          if (clues > targetClues) { lastErr = "carve-stall"; continue; }
+          if (clues > targetClues) continue;
           /* Phase B: exercise bias past target until a non-single contributes */
           if (nonSingles.length) {
             for (;;) {
@@ -1107,7 +1200,6 @@
           /* exercise-bias retry: with non-singles checked, a report that used
              none of them is an attempt failure — retry with a fresh grid */
           if (nonSingles.length && !ver.used.some((t) => nonSingles.includes(t))) {
-            lastErr = "exercise-bias";
             continue;
           }
           const given = board.map((v) => v !== 0);
@@ -1121,7 +1213,7 @@
           };
         }
         throw new Error(
-          TRAIN_BUDGET_MSG + (lastErr ? " (" + lastErr + ")" : " (attempts)"),
+          TRAIN_BUDGET_MSG,
         );
       }
 
@@ -1742,6 +1834,299 @@
             else if (k === "h" || k === "H") hint();
             else if (k === "p" || k === "P") togglePause();
           });
+
+          /* ===== Training studio (spec 011) ===== */
+          const TRAIN_KEY = "sudoku-training-v1";
+          const TRAIN_GROUPS = {
+            beginner: ["naked_single", "hidden_single"],
+            basic: [
+              "naked_pair",
+              "naked_triple",
+              "naked_quad",
+              "hidden_pair",
+              "hidden_triple",
+              "hidden_quad",
+              "pointing",
+              "claiming",
+            ],
+            intermediate: [
+              "x_wing",
+              "swordfish",
+              "jellyfish",
+              "skyscraper",
+              "two_string_kite",
+              "turbot_fish",
+              "xy_wing",
+              "xyz_wing",
+              "w_wing",
+            ],
+          };
+          const TRAIN_LEVELS = {
+            beginner: { label: "Beginner", clues: CLUES.easy, groups: ["beginner"] },
+            basic: { label: "Basic", clues: CLUES.medium, groups: ["beginner", "basic"] },
+            intermediate: {
+              label: "Intermediate",
+              clues: CLUES.hard,
+              groups: ["beginner", "basic", "intermediate"],
+            },
+          };
+          const TRAIN_LABELS = {
+            naked_single: "Naked single",
+            hidden_single: "Hidden single",
+            naked_pair: "Naked pair",
+            naked_triple: "Naked triple",
+            naked_quad: "Naked quad",
+            hidden_pair: "Hidden pair",
+            hidden_triple: "Hidden triple",
+            hidden_quad: "Hidden quad",
+            pointing: "Pointing",
+            claiming: "Claiming",
+            x_wing: "X-Wing",
+            swordfish: "Swordfish",
+            jellyfish: "Jellyfish",
+            skyscraper: "Skyscraper",
+            two_string_kite: "2-string kite",
+            turbot_fish: "Turbot fish",
+            xy_wing: "XY-Wing",
+            xyz_wing: "XYZ-Wing",
+            w_wing: "W-Wing",
+          };
+          const TRAIN_ADVANCED_REASON =
+            "Chain techniques cannot be verified yet - coming in a future version.";
+          let trainState = { level: "basic", unchecked: {} };
+          let trainBusy = false;
+
+          function loadTrain() {
+            try {
+              const raw = localStorage.getItem(TRAIN_KEY);
+              if (raw) {
+                const d = JSON.parse(raw);
+                if (!d || !TRAIN_LEVELS[d.level] || typeof d !== "object")
+                  throw new Error("bad shape");
+                const un = {};
+                for (const g of Object.keys(TRAIN_GROUPS)) {
+                  const arr = d.unchecked && d.unchecked[g];
+                  if (Array.isArray(arr))
+                    un[g] = arr.filter((id) => TRAIN_GROUPS[g].includes(id));
+                }
+                trainState = { level: d.level, unchecked: un };
+              }
+            } catch {
+              trainState = { level: "basic", unchecked: {} };
+              liveEl.textContent =
+                "Training preferences were reset (unreadable save).";
+            }
+          }
+          function saveTrain() {
+            try {
+              localStorage.setItem(TRAIN_KEY, JSON.stringify(trainState));
+            } catch {} /* private mode: preferences just won't persist */
+          }
+          function trainCheckedIds() {
+            const ids = [];
+            for (const g of TRAIN_LEVELS[trainState.level].groups)
+              for (const id of TRAIN_GROUPS[g])
+                if (
+                  g === "beginner" ||
+                  !(trainState.unchecked[g] || []).includes(id)
+                )
+                  ids.push(id);
+            return ids;
+          }
+          function renderTrainPanel() {
+            const adv = document.querySelector(
+              '#trainLevels button[data-level="advanced"]',
+            );
+            adv.textContent = "Advanced";
+            adv.title = TRAIN_ADVANCED_REASON;
+            for (const b of document.querySelectorAll("#trainLevels button"))
+              b.setAttribute(
+                "aria-pressed",
+                String(b.dataset.level === trainState.level),
+              );
+            const box = $("trainChecks");
+            box.textContent = "";
+            const groupLabels = {
+              beginner: "Always on",
+              basic: "Basic techniques",
+              intermediate: "Intermediate techniques",
+            };
+            for (const g of TRAIN_LEVELS[trainState.level].groups) {
+              const gh = document.createElement("div");
+              gh.className = "grp";
+              gh.textContent = groupLabels[g];
+              box.appendChild(gh);
+              for (const id of TRAIN_GROUPS[g]) {
+                const lab = document.createElement("label");
+                lab.className = "chk";
+                const inp = document.createElement("input");
+                inp.type = "checkbox";
+                inp.dataset.id = id;
+                inp.checked =
+                  g === "beginner" ||
+                  !(trainState.unchecked[g] || []).includes(id);
+                if (g === "beginner") {
+                  inp.disabled = true;
+                  inp.readOnly = true;
+                }
+                inp.addEventListener("change", () => {
+                  const un = (trainState.unchecked[g] = trainState
+                    .unchecked[g] || []);
+                  const i = un.indexOf(id);
+                  if (inp.checked && i >= 0) un.splice(i, 1);
+                  if (!inp.checked && i < 0) un.push(id);
+                  saveTrain();
+                });
+                lab.appendChild(inp);
+                lab.appendChild(
+                  document.createTextNode(" " + TRAIN_LABELS[id]),
+                );
+                box.appendChild(lab);
+              }
+              if (g === "beginner") {
+                const note = document.createElement("div");
+                note.className = "lock";
+                note.textContent =
+                  "Every board needs these two - they stay on.";
+                box.appendChild(note);
+              }
+            }
+            const isBeg = trainState.level === "beginner";
+            $("trainAll").disabled = isBeg;
+            $("trainNone").disabled = isBeg;
+          }
+          for (const b of document.querySelectorAll("#trainLevels button")) {
+            b.addEventListener("click", () => {
+              if (
+                b.dataset.level === "advanced" ||
+                b.dataset.level === trainState.level
+              )
+                return;
+              trainState.level = b.dataset.level;
+              saveTrain();
+              renderTrainPanel();
+            });
+          }
+          $("trainAll").addEventListener("click", () => {
+            const g = trainState.level;
+            if (g === "beginner") return;
+            trainState.unchecked[g] = [];
+            saveTrain();
+            renderTrainPanel();
+          });
+          $("trainNone").addEventListener("click", () => {
+            const g = trainState.level;
+            if (g === "beginner") return;
+            trainState.unchecked[g] = TRAIN_GROUPS[g].slice();
+            saveTrain();
+            renderTrainPanel();
+          });
+
+          function adoptTraining(res) {
+            puzzle = res.board.slice();
+            solution = res.solution.slice();
+            board = res.board.slice();
+            given = res.given.slice();
+            notes = new Array(N).fill(0);
+            sel = -1;
+            mistakes = 0;
+            hints = 0;
+            elapsed = 0;
+            started = false;
+            paused = false;
+            won = false;
+            wonRecord = false;
+            undoStack = [];
+            pauseBtn.textContent = "\u23F8 Pause";
+            diff = "training";
+            diffEl.textContent = "Training \u00b7 " + TRAIN_LEVELS[trainState.level].label;
+            updateBestDisplay();
+            updateVeil();
+            save();
+            render();
+          }
+
+          $("trainGen").addEventListener("click", () => {
+            if (trainBusy) return;
+            if (
+              started &&
+              !won &&
+              !window.confirm(
+                "Build a training board? Your current game will be replaced.",
+              )
+            )
+              return;
+            trainBusy = true;
+            $("trainGen").disabled = true;
+            liveEl.textContent = "Building your board\u2026";
+            /* one paint before the synchronous generator run */
+            window.setTimeout(() => {
+              let msg;
+              try {
+                const res = generateTrainingBoard(
+                  trainCheckedIds(),
+                  TRAIN_LEVELS[trainState.level].clues,
+                );
+                adoptTraining(res);
+                msg =
+                  "Board built \u2014 " +
+                  res.clues +
+                  " clues. Solve path (easiest techniques first): " +
+                  res.report.map((t) => TRAIN_LABELS[t]).join(", ");
+                document.getElementById("training").open = false;
+              } catch (e) {
+                msg = e.message;
+              }
+              liveEl.textContent = msg;
+              trainBusy = false;
+              $("trainGen").disabled = false;
+            }, 30);
+          });
+
+          function buildPrintView() {
+            const pv = $("printView");
+            pv.textContent = "";
+            const grid = (vals, giv, title, cls) => {
+              const sec = document.createElement("section");
+              sec.className = cls;
+              const h = document.createElement("h2");
+              h.className = "ptitle";
+              h.textContent = title;
+              const g = document.createElement("div");
+              g.className = "pgrid";
+              g.setAttribute("role", "img");
+              g.setAttribute("aria-label", title);
+              for (let i = 0; i < N; i++) {
+                const c = document.createElement("div");
+                c.className = "pcell" + BOXCLS[i];
+                c.textContent = vals[i] ? String(vals[i]) : "";
+                if (vals[i] && !giv[i]) c.style.fontStyle = "italic";
+                g.appendChild(c);
+              }
+              sec.appendChild(h);
+              sec.appendChild(g);
+              return sec;
+            };
+            pv.appendChild(
+              grid(board, given, "Sudoku \u2014 training board", ""),
+            );
+            if ($("trainSol").checked)
+              pv.appendChild(
+                grid(
+                  solution,
+                  solution.map(() => true),
+                  "Solution",
+                  "psol",
+                ),
+              );
+          }
+          $("trainPrint").addEventListener("click", () => {
+            buildPrintView();
+            window.print();
+          });
+
+          loadTrain();
+          renderTrainPanel();
 
           document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
