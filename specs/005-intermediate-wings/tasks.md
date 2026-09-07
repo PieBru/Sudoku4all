@@ -1,4 +1,5 @@
 # Tasks — 005 Intermediate wings
+
 - [x] Six fragments verified by unit-check script (claims + conflict-free + elim legality)
 - [x] Wings sections with XYZ one-given diff board; WXYZ/Fireworks named only
 - [x] Uniqueness section: deadly rectangle + UR1 worked + types table
