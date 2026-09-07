@@ -7,12 +7,17 @@
    Renders a 9×9 grid with thick box separators (the game's bR/bB pattern).
    Also syncs the game's explicit theme choice (sudoku-theme-v1) if present. */
 (() => {
-  
   try {
     /* the app stores a bare string ("dark"); accept JSON too for safety */
-    var raw = localStorage.getItem("sudoku-theme-v1"), t = null;
-    try { t = JSON.parse(raw || "null"); } catch (e) { t = raw; }
-    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    var raw = localStorage.getItem("sudoku-theme-v1"),
+      t = null;
+    try {
+      t = JSON.parse(raw || "null");
+    } catch (e) {
+      t = raw;
+    }
+    if (t === "light" || t === "dark")
+      document.documentElement.dataset.theme = t;
   } catch (e) {
     /* private mode or blocked storage: system theme is fine */
   }
@@ -32,11 +37,17 @@
           cands[+kv[0]] = kv[1] || "";
         });
       var hl = (el.getAttribute("data-hl") || "")
-        .split(",").filter(Boolean).map(Number);
+        .split(",")
+        .filter(Boolean)
+        .map(Number);
       var hl2 = (el.getAttribute("data-hl2") || "")
-        .split(",").filter(Boolean).map(Number);
+        .split(",")
+        .filter(Boolean)
+        .map(Number);
       var hx = (el.getAttribute("data-hx") || "")
-        .split(",").filter(Boolean).map(Number);
+        .split(",")
+        .filter(Boolean)
+        .map(Number);
       el.textContent = "";
       for (var i = 0; i < 81; i++) {
         var c = document.createElement("div");
@@ -65,7 +76,9 @@
     });
   }
   if (document.readyState === "loading")
-    document.addEventListener("DOMContentLoaded", () => { render(document); });
+    document.addEventListener("DOMContentLoaded", () => {
+      render(document);
+    });
   else render(document);
   window.LessonBoards = { render: render };
 })();

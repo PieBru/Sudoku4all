@@ -29,7 +29,7 @@ PAGE_RULES = {
     "05-extreme.html": {
         "techniques": ["tier5", "champion", "path"],
         "full_boards_min": 0,
-        "required": ["target=\"_blank\""],
+        "required": ['target="_blank"'],
     },
     "04-advanced.html": {
         "techniques": [
@@ -324,7 +324,9 @@ with sync_playwright() as p:
             )
         if re.match(r"\d\d-", page_path.name):
             given = pg.locator(".board .given").count()
-            check(f"board givens render [{page_path.name}]", given > 0, f"given={given}")
+            check(
+                f"board givens render [{page_path.name}]", given > 0, f"given={given}"
+            )
             br_count = pg.locator(".board .cell.bR").count()
             check(
                 f"box separators render [{page_path.name}]",
@@ -387,7 +389,11 @@ with sync_playwright() as p:
     tp.wait_for_timeout(150)
     th = tp.evaluate("document.documentElement.dataset.theme || ''")
     bg = tp.evaluate("getComputedStyle(document.body).backgroundColor")
-    check("lesson pages follow the app's dark theme", th == "dark", f"theme={th!r} bg={bg}")
+    check(
+        "lesson pages follow the app's dark theme",
+        th == "dark",
+        f"theme={th!r} bg={bg}",
+    )
     tp.close()
 
     pg = ctx.new_page()
