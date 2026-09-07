@@ -31,6 +31,8 @@
         });
       var hl = (el.getAttribute("data-hl") || "")
         .split(",").filter(Boolean).map(Number);
+      var hl2 = (el.getAttribute("data-hl2") || "")
+        .split(",").filter(Boolean).map(Number);
       var hx = (el.getAttribute("data-hx") || "")
         .split(",").filter(Boolean).map(Number);
       el.textContent = "";
@@ -54,6 +56,7 @@
           });
         }
         if (hl.indexOf(i) >= 0) c.classList.add("hl");
+        if (hl2.indexOf(i) >= 0) c.classList.add("hl2");
         if (hx.indexOf(i) >= 0) c.classList.add("xmark");
         el.appendChild(c);
       }

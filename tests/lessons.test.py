@@ -26,6 +26,19 @@ PAGE_RULES = {
         "techniques": ["naked_pair", "hidden_pair", "pointing", "claiming"],
         "full_boards_min": 0,
     },
+    "04-advanced.html": {
+        "techniques": [
+            "links",
+            "aic",
+            "simple_coloring",
+            "x_cycles",
+            "medusa_3d",
+            "xy_chain",
+            "grouped_chains",
+        ],
+        "full_boards_min": 0,
+        "required": ['data-hl="0,38" data-hl2="20,43"'],
+    },
     "03-intermediate.html": {
         "techniques": [
             "x_wing",
@@ -185,6 +198,12 @@ for page in pages:
                 f"banned strings absent [{page.name}]",
                 not hits,
                 f"found={hits}",
+            )
+            miss2 = [b for b in rule.get("required", []) if b not in text]
+            check(
+                f"required strings present [{page.name}]",
+                not miss2,
+                f"missing={miss2}",
             )
     for cls, a in c.boards:
         if "mini" in cls.split():

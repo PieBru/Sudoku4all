@@ -18,7 +18,7 @@
   --conf: #d8492f;
   --note: #8a8578;
   --accent: #1660c1;
-  --hl: #ffd95c;
+  --hl: #ffd95c; --hl2: #7ec8ff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -117,6 +117,7 @@ footer[data-part="footer"] {
 .board .cell.bB { border-bottom: 2px solid var(--thick); }
 .board .cell.given { color: var(--given); }
 .board .cell.hl { background: var(--hl); }
+.board .cell.hl2 { background: var(--hl2); }
 .board .cell.xmark::after {
   content: "\2717"; position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
