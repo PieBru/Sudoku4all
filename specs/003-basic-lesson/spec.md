@@ -11,8 +11,8 @@
 ## Context (OBSERVED)
 
 - Technique source: the Brief, section *Tier 2 — Basic: subsets and intersections*: naked pair/triple/quad; hidden pair/triple/quad; locked candidates — pointing; locked candidates — claiming. Names and one-line definitions come from the Brief (SudokuWiki + HoDoKu); wording may be simplified, claims may not be invented (proposal §6).
-- This chapter's language tier changes to plain English (L3): sentence ceiling ~25 words; every new term defined with an example at first use; kid budgets no longer apply.
-- Chapter graduation fixed by the proposal §3: the reader can spot a naked pair and a pointing pair on a prepared board.
+- This chapter's language tier changes to plain English (L3): sentence ceiling 25 words; every new term defined with an example at first use; kid budgets no longer apply.
+- Chapter graduation fixed by the proposal §3: the reader can spot a naked pair and a pointing pattern on a prepared board.
 - Framework from spec 000: template sections, shared stylesheet, display-board renderer, both gates. Chapter 01's page (spec 001) is this page's prev neighbor and already exists by build order.
 - The "Try it" instruction targets the game's Medium difficulty (CLUES medium = 34, sudoku.html:681) with controls named exactly as the app words them (New game etc., sudoku.html:407-417).
 
@@ -88,7 +88,7 @@ After the checkpoint the reader wants a live target; the Try it section sends th
 
 ### Measurable Outcomes
 
-- **SC-001**: The reader can spot a naked pair and a pointing pair on prepared boards (checkpoint content check — pass/fail).
+- **SC-001**: The reader can spot a naked pair and a pointing pattern on prepared boards (checkpoint content check — pass/fail).
 - **SC-002**: The page passes the plain-English budget end to end (readability gate exit 0 — pass/fail).
 - **SC-003**: The page loads with zero page errors, all template sections, all links resolving, boards rendering (lesson gate exit 0 — pass/fail).
 - **SC-004**: The game remains untouched by this spec (existing gates exit 0 unchanged — pass/fail).

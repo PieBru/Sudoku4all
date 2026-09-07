@@ -15,14 +15,14 @@
 - A verified real puzzle pair exists for the fruit 4×4 (proposal Appendix D, checked 2026-09-07): puzzle `1.34341..14343.1`, solution `1234341221434321` — valid grid, exactly one solution. The digit 4×4 and 6×6 pairs are authored in this spec's implementation and validated by the gate the same way.
 - Playable boards are pure data: size, box dimensions, puzzle, solution, optional symbols — no solver ships (proposal Appendix D). A tiny playable-board script (the only new script besides the framework's display renderer) renders and checks them in the page.
 - App terminology to mirror (L6): New game (407), Restart puzzle (408), notes (412), Undo (415), Hint (417) at sudoku.html:407-417; given cells in the app look pinned — the fun-size boards copy that look.
-- Fear-killers required up front (L4): no math is needed; nothing is timed unless you ask; Undo and Hint always exist; the game never judges you.
+- Fear-killers required up front (L4, honest form sealed by proposal v3): no math is needed; the lessons are never timed and never count mistakes; Undo and Hint always exist. The real game does measure — its clock only reports how fast you were and never rushes you, and it counts mistakes without punishing one (Undo always rescues). The page says this plainly instead of promising a timer-free game the app cannot deliver.
 - Framework pieces (index row for chapter 00, stylesheet, kid language budget, lesson gate) come from spec 000; this spec extends the gate with fun-size validation and playability checks.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A frightened adult wins their first game in one minute (Priority: P1)
 
-An adult who always avoided Sudoku opens the page. Up front it says: no math needed, nothing is timed, you cannot fail here. They play the fruit board — four fruits, sixteen squares — tap a cell, tap a fruit. A wrong fruit wobbles and disappears; nothing is counted, nothing turns red. The board fills; a small celebration appears. Fear did not get a foothold.
+An adult who always avoided Sudoku opens the page. Up front it says: no math needed, nothing here is timed, you cannot fail here — and the real game's clock only watches, it never rushes. They play the fruit board — four fruits, sixteen squares — tap a cell, tap a fruit. A wrong fruit wobbles and disappears; nothing is counted, nothing turns red. The board fills; a small celebration appears. Fear did not get a foothold.
 
 **Why this priority**: the chapter exists to convert fear into fun at first contact; everything else is secondary.
 
@@ -30,8 +30,8 @@ An adult who always avoided Sudoku opens the page. Up front it says: no math nee
 
 **Acceptance Scenarios**:
 
-1. **Given** the page top, **When** the visitor reads the intro, **Then** all four fear-killers are stated before any game (no math, nothing timed unless asked, Undo and Hint exist, no judgment).
-2. **Given** the fruit board, **When** the visitor taps a cell and then a fruit button, **Then** the fruit appears in the cell (big tap targets; keyboard digits also work).
+1. **Given** the page top, **When** the visitor reads the intro, **Then** all four fear-killers are stated before any game (no math is needed; these lessons are never timed and never count mistakes; Undo and Hint always exist; when you play the real game its clock only reports — never rushes — and its mistake count never punishes, Undo always rescues).
+2. **Given** the fruit board, **When** the visitor taps a cell and then a fruit button, **Then** the fruit appears in the cell (big tap targets; number keys 1–4 also work).
 3. **Given** a tap that contradicts the solution, **When** it is made, **Then** the cell wobbles gently and stays empty — no mistake counter, no red, no failure state anywhere in this chapter.
 4. **Given** the last empty cell is filled correctly, **When** the board completes, **Then** a small celebration appears.
 
@@ -75,10 +75,10 @@ A helper (parent, teacher) wants certainty the mini games are fair: every board 
 
 ### Functional Requirements
 
-- **FR-001**: The chapter page MUST exist at the lessons location for chapter 00, follow the shared template, and state all four fear-killers before the first game, in kid-readable language.
+- **FR-001**: The chapter page MUST exist at the lessons location for chapter 00, follow the shared template, and state all four fear-killers before the first game, in kid-readable language — the fourth being the honest note about the real game (its clock only reports how fast you were, its mistake count never punishes, Undo always rescues).
 - **FR-002**: The page MUST contain the three playable fun-size boards in order — fruit 4×4 (2×2 boxes, four fruit symbols), digit 4×4, digit 6×6 (2×3 boxes) — followed by a bridge section showing the 6×6 beside the real 9×9 with an invitation to play the real game.
 - **FR-003**: Concepts MUST be named during play in kid words — row, column, cell, box — including that boxes are wide rectangles on the 6×6; never in a text-only preamble before the first game.
-- **FR-004**: Playable input MUST be: tap a cell then tap a big symbol/digit button (keyboard digits also accepted); entries contradicting the solution wobble gently and do not stick; there MUST be no mistake counter, timer, red failure styling, or any other failure state on this page.
+- **FR-004**: Playable input MUST be: tap a cell then tap a big symbol/digit button (number keys also accepted — 1–4 on a 4×4, 1–6 on a 6×6); entries contradicting the solution wobble gently and do not stick; there MUST be no mistake counter, timer, red failure styling, or any other failure state on this page.
 - **FR-005**: Completing a playable board MUST trigger a small celebration visible to the learner.
 - **FR-006**: Given cells MUST be locked and visually pinned like the game's givens.
 - **FR-007**: Every playable board's data MUST be validated by the lesson gate: valid solution, puzzle consistent with it, exactly one solution (brute-force check); the fruit 4×4 MUST use the verified pair recorded in the proposal's Appendix D.

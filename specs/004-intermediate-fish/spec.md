@@ -12,7 +12,7 @@
 
 - Technique source: the Brief, section *Tier 3 — Intermediate*, first half. Fish family: X-Wing, Swordfish, Jellyfish, Finned/Sashimi fish, Franken/Mutant fish. Single-digit patterns: Skyscraper, 2-String Kite, Turbot fish, Empty rectangle. Names and one-line definitions come from the Brief; the Brief also notes SudokuWiki deprecates the empty rectangle as redundant — the page must be honest about that (proposal §6: never contradict the Brief).
 - This spec delivers the page shell plus these sections; a sibling spec (`005-intermediate-wings`) completes the page with wings, uniqueness, Sue de Coq, and remote pairs. Until then the page MUST present itself as part 1 of 2 (proposal §5 split rule).
-- Language tier: plain English (L3) — sentence ceiling ~25 words, terms defined at first use, names Brief-exact.
+- Language tier: plain English (L3) — sentence ceiling 25 words, terms defined at first use, names Brief-exact.
 - Chapter graduation (proposal §3) spans the finished page: find an X-Wing and a UR type 1 on prepared boards. The X-Wing half becomes teachable and checkable with this spec; the UR half lands with spec 005, which owns the completed page's checkpoint.
 - Framework from spec 000; prev neighbor chapter 02 (spec 003) exists by build order; next neighbor chapter 04 does not exist yet.
 
