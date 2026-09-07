@@ -407,6 +407,7 @@
           <button id="newBtn" type="button">&#128260; New game</button>
           <button id="resetBtn" type="button">&#8617; Restart puzzle</button>
           <button id="themeBtn" type="button">&#9788; Theme: System</button>
+          <button id="learnBtn" type="button">&#127891; Learn</button>
         </div>
         <div class="row">
           <button id="notesBtn" type="button" aria-pressed="false">
@@ -668,6 +669,7 @@
           const eraseBtn = $("eraseBtn"),
             hintBtn = $("hintBtn"),
             newBtn = $("newBtn"),
+            learnBtn = $("learnBtn"),
             resetBtn = $("resetBtn");
           const diffSel = $("diff"),
             conflictChk = $("conflictChk"),
@@ -1173,7 +1175,7 @@
             if (paused) togglePause();
             else if (won) veil.hidden = true;
           });
-          newBtn.addEventListener("click", () => {
+            newBtn.addEventListener("click", () => {
             if (
               started &&
               !won &&
@@ -1184,6 +1186,9 @@
             }
             newGame();
             newBtn.blur();
+          });
+          learnBtn.addEventListener("click", () => {
+            window.location.assign("lessons/index.html"); /* constant relative path — spec 000 Learn link */
           });
           resetBtn.addEventListener("click", () => {
             if (

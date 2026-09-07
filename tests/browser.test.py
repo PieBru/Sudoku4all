@@ -1,16 +1,18 @@
-"""Browser gate — run: uv run --with playwright python tests/browser.test.py
+"""Browser gate — run: uv run python tests/browser.test.py
 
 Asserts the UI-level fixes from the 2026-09-07 audit against the live page:
 box separators survive render(), wrong-entry flash visible, Shift+digit notes
 fire on real-layout events, ARIA rows, color-scheme, corrupt-save rejection,
-undo blocked after win, stats store only consumed fields.
+undo blocked after win, stats store only consumed fields, and (spec 000) the
+Learn link opens the lessons index.
 """
 
 import sys
+from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-URL = "file:///mnt/2TB/Piero/Work/Sudoku/sudoku.html"
+URL = (Path(__file__).resolve().parents[1] / "sudoku.html").as_uri()
 fails = []
 
 
@@ -184,6 +186,22 @@ with sync_playwright() as p:
                veilHidden: document.getElementById('veil').hidden})"""
     )
     check("undo blocked after win", r["won"] and not r["veilHidden"], str(r))
+
+    # spec 000: the Learn control opens the lessons index (one interaction)
+    lp = ctx.new_page()
+    lerrors = []
+    lp.on("pageerror", lambda e, sink=lerrors: sink.append(str(e)))
+    lp.goto(URL)
+    lp.wait_for_timeout(300)
+    lp.click("#menu summary")  # open the collapsed settings menu first
+    lp.click("#learnBtn")
+    lp.wait_for_url("**/lessons/index.html", timeout=5000)
+    check(
+        "Learn link opens the lessons index",
+        "lessons/index.html" in lp.url and not lerrors,
+        f"{lp.url} errors={lerrors[:2]}",
+    )
+    lp.close()
 
     ctx.close()
     b.close()

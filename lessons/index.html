@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learn Sudoku — chapter index</title>
+    <link rel="stylesheet" href="lesson.css" />
+  </head>
+  <body>
+    <a class="back" href="../sudoku.html">&#9664; Back to the game</a>
+    <header>
+      <h1>Learn Sudoku, one step at a time</h1>
+      <p class="sub">
+        Six short chapters. Each one teaches a few tricks, then sends you
+        back to the game to practice them.
+      </p>
+    </header>
+
+    <section>
+      <h2>Which chapter is for me?</h2>
+      <ol class="guide">
+        <li>Never played, or does Sudoku look scary? Start at chapter 00.</li>
+        <li>You already play easy boards and want your first tricks? Start at chapter 01.</li>
+        <li>Stuck on medium or harder boards? Jump to chapter 02 or later.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>The ladder</h2>
+      <ul class="chapters">
+        <li data-chapter="00">
+          <span class="num">00</span>
+          <strong>Sudoku? Hello!</strong>
+          <span class="badge">Start here</span>
+          <span class="who">for first-timers, kids and grown-ups who fear its complexity</span>
+          <span class="soon">— coming soon</span>
+        </li>
+        <li data-chapter="01">
+          <span class="num">01</span>
+          <strong>Your first two tricks</strong>
+          <span class="badge">Start here</span>
+          <span class="who">for players who know the rules and want to get faster</span>
+          <span class="soon">— coming soon</span>
+        </li>
+        <li data-chapter="02">
+          <span class="num">02</span>
+          <strong>Pairs that talk to each other</strong>
+          <span class="who">for easy-level solvers ready to crack medium boards</span>
+          <span class="soon">— coming soon</span>
+        </li>
+        <li data-chapter="03">
+          <span class="num">03</span>
+          <strong>Patterns with funny names</strong>
+          <span class="who">for medium solvers hunting hard-board patterns</span>
+          <span class="soon">— coming soon</span>
+        </li>
+        <li data-chapter="04">
+          <span class="num">04</span>
+          <strong>Chains of logic</strong>
+          <span class="who">for strong solvers ready for expert boards</span>
+          <span class="soon">— coming soon</span>
+        </li>
+        <li data-chapter="05">
+          <span class="num">05</span>
+          <strong>The extreme map</strong>
+          <span class="who">a guided tour of champion territory</span>
+          <span class="soon">— coming soon</span>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Meet a real board</h2>
+      <p>
+        This is a real game board, built by the game itself. Nine rows, nine
+        columns, and nine thick-bordered boxes. Every row, every column and
+        every box holds the digits 1 to 9 — exactly once each.
+      </p>
+      <figure>
+        <div
+          class="board"
+          data-givens="347200091000001400016900700270310600963400170000090283085703000790002050400100867"
+          role="img"
+          aria-label="A real 9 by 9 Sudoku board with 40 given digits and thick box borders"
+        ></div>
+        <figcaption>A genuine game position with exactly one solution.</figcaption>
+      </figure>
+    </section>
+
+    <footer data-part="footer">
+      <p>
+        <a href="../sudoku.html">Play the game</a> any time — the lessons
+        wait for you.
+      </p>
+    </footer>
+
+    <script src="board.js"></script>
+  </body>
+</html>

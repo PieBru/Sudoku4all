@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal.md §1, §5 (row `000-lesson-framework`), §5.1, §5.2, §7, Appendix C
 
