@@ -35,9 +35,15 @@ PAGE_RULES = {
             "medusa_3d",
             "xy_chain",
             "grouped_chains",
+            "als",
+            "forcing_chains",
+            "death_blossom",
+            "ape",
+            "escalation",
         ],
         "full_boards_min": 0,
         "required": ['data-hl="0,38" data-hl2="20,43"'],
+        "banned": ["part 1"],
     },
     "03-intermediate.html": {
         "techniques": [

@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal.md §3 (chapter 04 row), §4 (L3, L6), §5 (row `007-advanced-als-nets`), §5.1, §7; Brief §Tier 4 (ALS family, Death Blossom, APE, Bowman's Bingo, forcing chains) + last-resort note
 

@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chapter 04 — Chains of logic (part 1)</title>
+    <title>Chapter 04 — Chains and sets</title>
     <link rel="stylesheet" href="lesson.css" />
   </head>
   <body>
     <header data-part="learn">
       <p class="crumbs"><a href="index.html">All chapters</a> &#183; Chapter 04</p>
-      <h1>Chapter 04 — Chains of logic <span class="tag">part 1 of 2</span></h1>
+      <h1>Chapter 04 — Chains and sets</h1>
       <p class="lead">
         Expected background: everything through chapter 03, wings included.
         Here logic stops fitting in one glance and starts traveling —
@@ -207,37 +207,159 @@
           the name.
         </p>
       </section>
+
+      <section data-technique="als">
+        <h2>ALS: almost locked sets</h2>
+        <p>
+          A <em>locked set</em> is n cells holding exactly n digits —
+          your naked pairs from chapter 02. An <em>almost locked
+          set</em> (ALS) is the loose version: n cells holding exactly
+          n+1 digits. One digit too many — almost tight, almost
+          forced.
+        </p>
+        <p>
+          The power move is <em>ALS-XZ</em>: two sets sharing two
+          digits. One shared digit, x, is <em>restricted</em> — its
+          cells on both sides all see each other, so only one set can
+          use it. Then the other shared digit, z, must land in one set
+          or the other.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000000000900056487000000000000000000500870629000000000001000000030000000000000000" data-cands="10:12;11:23;37:14;38:34;20:35" data-hl="10,11,37,38" data-hx="20"></div>
+          <figcaption>
+            Set A: r2c2 holds 1/2 and r2c3 holds 2/3 — two cells,
+            three digits. Set B: r5c2 holds 1/4 and r5c3 holds 3/4.
+            Shared digits 1 and 3. The 1s (r2c2, r5c2) share column 2
+            — restricted. So one set must place a 3: any cell seeing
+            both 3-cells, like r3c3 down column 3, loses the 3.
+          </figcaption>
+        </figure>
+        <p>
+          Grow the idea: three sets chained through restricted commons
+          give an <em>ALS chain</em>; two sets plus a hinge give the
+          <em>ALS-XY-Wing</em>. They are the wing and chain ideas you
+          already own, with sets standing in for single cells.
+        </p>
+      </section>
+
+      <section data-technique="forcing_chains">
+        <h2>Forcing chains: assume and follow</h2>
+        <p>
+          A <em>forcing chain</em> stops being clever: pick a cell,
+          assume each of its candidates in turn, and follow what
+          follows. If every branch reaches the same conclusion, that
+          conclusion is proven.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000000000900056487000000000000000000500870629000000000001000000030000000000000000" data-cands="10:12;11:23;37:14;38:34;46:4" data-hl="10,37,38" data-hx="46"></div>
+          <figcaption>
+            Branch one: r2c2 = 1, so r5c2 loses 1 and must be 4.
+            Branch two: r2c2 = 2, so r2c3 is 3, so r5c3 loses 3 and
+            must be 4. Both branches put a 4 into row 5's pair — so
+            r6c2, seeing both pair cells, loses its 4.
+          </figcaption>
+        </figure>
+        <p>
+          The flavors differ only in what branches: a <em>digit
+          forcing chain</em> branches on a digit's two homes, a
+          <em>cell forcing chain</em> on one cell's candidates, a
+          <em>unit forcing chain</em> on every placement in a unit.
+          <em>Nishio</em> is the pessimist's version: assume a
+          candidate is true and hunt for a contradiction.
+          <em>Bowman's Bingo</em> is the same search organized as a
+          tidy tree of consequences — the paperwork version of what
+          you just did.
+        </p>
+      </section>
+
+      <section data-technique="death_blossom">
+        <h2>Death Blossom <span class="tag">rare</span></h2>
+        <p>
+          A <em>Death Blossom</em> has a <em>stem</em> cell and
+          <em>petals</em>. Each petal is an ALS that the stem sees,
+          covering one stem candidate. The stem must be one of its
+          candidates, so one petal always gets tightened.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000000000000032000020000000000300000005900867708600190410000000200000000000040000" data-cands="40:12;36:13;37:34;49:25;50:45;46:4" data-hl="40,36,37,49,50" data-hx="46"></div>
+          <figcaption>
+            Stem r5c5 holds 1/2. Petal one (r5c1, r5c2) holds 1 among
+            its digits; petal two (r6c5, r6c6) holds 2. If the stem is
+            1, petal one tightens and must use its 4; if the stem is
+            2, petal two must use its 4. Either way a 4 lands in the
+            petals — r6c2, seeing both 4-cells, loses its 4.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section data-technique="ape">
+        <h2>Aligned Pair Exclusion <span class="tag">rare</span></h2>
+        <p>
+          <em>Aligned Pair Exclusion</em> (APE) takes two cells that
+          see each other and lists their possible value pairs. Any
+          pair that would kill a third cell is impossible. Kill every
+          pair containing some value, and that value is gone.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000050000300000000010900000002009000000000000000080000000060000000040000000070000" data-cands="40:123;13:12;31:13;22:23" data-hl="13,22,31" data-hx="40"></div>
+          <figcaption>
+            Aligned pair: A (r5c5) holds 1/2/3 and B (r2c5) holds 1/2,
+            same column. K1 (r4c5) holds 1/3, K2 (r3c5) holds 2/3 —
+            both see A and B. Pair A=3, B=1 kills K1; pair A=3, B=2
+            kills K2. Every pair with A=3 dies, so A loses the 3.
+          </figcaption>
+        </figure>
+        <p>
+          Rare finds, both of these — a solver meets them a few times
+          a year, on the cruelest boards. Know the names, sleep well.
+        </p>
+      </section>
+
+      <section data-technique="escalation">
+        <h2>The escalation order, and the last resort</h2>
+        <p>
+          Cheap first, always: singles, then pairs and intersections,
+          then fish and wings, then chains and sets. Hard techniques
+          take minutes; easy ones take seconds. Scan the cheap ladder
+          twice before paying for anything expensive.
+        </p>
+        <p>
+          And the honest last resort: if every logical avenue is
+          exhausted, <em>trial</em> — guess a candidate and follow it —
+          reaches the same place an enormous forcing net would. Purists
+          object; pragmatists finish puzzles. The debate is real; the
+          solved grid doesn't care.
+        </p>
+      </section>
     </main>
 
     <section data-part="try">
       <h2>Try it in the game</h2>
       <p>
         <a href="../sudoku.html">Open the game</a>, set difficulty to
-        Expert, and press New game. Before reaching for anything else,
-        pick one digit and color it: chase its strong links, two colors,
-        then hunt for a cell seeing both. One coloring often cracks an
-        expert board's first wall.
+        Expert, and press New game. If you get stuck twice on one
+        technique, stop: drop to the cheapest technique on the ladder
+        and re-scan the whole board before assuming anything harder.
       </p>
     </section>
 
     <section data-part="checkpoint">
-      <h2>Checkpoint (part 1)</h2>
-      <p>Can you do these three things?</p>
+      <h2>Checkpoint</h2>
+      <p>You graduate from chapter 04 when you can do all of these:</p>
       <ol>
         <li>
-          Say the difference between a strong link and a weak link, and
-          point at one of each on the links board.
+          Follow the worked AIC chain end to end, saying at each step
+          whether the link is strong or weak and why.
         </li>
         <li>
-          On the coloring board, name the yellow family, the blue
-          family, and why r1c8 loses its 5.
+          On the ALS-XZ board, name the two sets, the restricted common
+          digit, and what r3c3 loses.
         </li>
         <li>
           Flip back to chapter 03's XY-Wing board and find the hinge and
           the two pincers in under a minute.
         </li>
       </ol>
-      <p>Part 2 of this chapter adds the ALS family and forcing nets.</p>
     </section>
 
     <footer data-part="footer">

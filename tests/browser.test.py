@@ -124,13 +124,24 @@ with sync_playwright() as p:
     r = page.evaluate(
         """() => {
         const s = JSON.parse(localStorage.getItem('sudoku-v1'));
-        let a = -1, c = -1;
-        for (let j = 0; j < 9; j++) if (s.puzzle[j]) { if (a < 0) a = j; else if (s.puzzle[j] !== s.puzzle[a]) { c = j; break; } }
-        if (c < 0) return {ok: false, why: 'no pair'};
-        s.puzzle[c] = s.puzzle[a];
-        s.elapsed = 999; /* marker: proves rejection if it comes back as 0 */
-        localStorage.setItem('sudoku-v1', JSON.stringify(s));
-        return {ok: true, tampered: s.puzzle.slice(0, 9)};
+        const units = [];
+        for (let k = 0; k < 9; k++) {
+          units.push([...Array(9)].map((_, j) => k * 9 + j));
+          units.push([...Array(9)].map((_, j) => j * 9 + k));
+        }
+        for (let br = 0; br < 3; br++) for (let bc = 0; bc < 3; bc++)
+          units.push([...Array(9)].map((_, k) => (br * 3 + (k / 3 | 0)) * 9 + bc * 3 + k % 3));
+        for (const u of units) {
+          const g = u.filter(j => s.puzzle[j]);
+          if (g.length < 2) continue;
+          if (s.puzzle[g[0]] !== s.puzzle[g[1]]) {
+            s.puzzle[g[1]] = s.puzzle[g[0]];
+            s.elapsed = 999; /* marker: proves rejection if it comes back as 0 */
+            localStorage.setItem('sudoku-v1', JSON.stringify(s));
+            return {ok: true, tampered: s.puzzle.slice(0, 9)};
+          }
+        }
+        return {ok: false};
       }"""
     )
     page.close(run_before_unload=False)
@@ -146,7 +157,7 @@ with sync_playwright() as p:
     check(
         "corrupt save (conflicting givens) rejected -> fresh game",
         r["ok"] and r2["elapsed"] == 0 and r2["row"] != r["tampered"],
-        f"tampered={r['tampered']} after reboot={r2['row']} elapsed={r2['elapsed']}",
+        f"tampered={r.get('tampered')} after reboot={r2['row']} elapsed={r2['elapsed']}",
     )
     check(
         "reboot after corrupt save: no page errors", not errors2, "; ".join(errors2[:3])
