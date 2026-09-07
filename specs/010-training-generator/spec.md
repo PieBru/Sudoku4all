@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal-training.md §1 (goal), §4 (levels + carve targets + floor semantics), §5 (two-phase carve algorithm, retry triggers, guards), §6.2 (report), §8 (Training-engine gate, generator half), §9 decisions 1/4/6/7
 
@@ -74,7 +74,7 @@ Generation is search under guards. When it cannot deliver, the player hears why 
 - **FR-001**: A pure generator section MUST live beside the engine in `sudoku.html`'s headless area, exported through the existing seam, consuming spec 009's `solveWithAllowed`; it MUST NOT touch the DOM or the casual `makePuzzle` path.
 - **FR-002**: Generation MUST follow the two-phase carve (proposal §5): Phase A removes shuffled cells while the allowed-set solve still completes, stopping at the level's `CLUES` target (Beginner 40, Basic 34, Intermediate 29); Phase B continues the same rule past the target, only when ≥ 1 non-single technique is checked, until one contributes or no removal preserves allowed-solvability.
 - **FR-003**: Every generation run MUST end with a final verification solve of the pristine board plus the `countSolutions(board, 2) == 1` tripwire; a tripwire failure MUST abort loudly with no retry (engine bug path), and the gate MUST exercise it via the unsound-X-Wing sabotage.
-- **FR-004**: Every run MUST carry loop guards with spec-tunable initial values: ≤ 8 full attempts, ≤ 5 s total wall clock, ≤ 60 solver runs per attempt; budget exhaustion MUST fail loudly with the proposal's message text, never return a board.
+- **FR-004**: Every run MUST carry loop guards with spec-tunable initial values: ≤ 8 full attempts, ≤ 5 s total wall clock, ≤ 120 solver runs per attempt (raised from the proposal's 60: Phase A alone consumes ~45–55 runs at the Basic target, which starved Phase B's exercise bias; 8 attempts × 120 runs still completes in well under the 5 s wall cap); budget exhaustion MUST fail loudly with the proposal's message text, never return a board.
 - **FR-005**: A successful result MUST carry the generated board, its full solution, the given-cell flags, the final clue count, and the report (technique IDs from the final verification solve, cheapest-first).
 - **FR-006**: The result data MUST be shaped so the game can adopt it as an active game directly (spec 011) while preserving the app's invariants: unique solution, valid givens, standard game features work (proposal decision 12).
 - **FR-007**: Exclusivity MUST hold for every emitted board: re-solving the pristine board under the checked set alone completes it (gate asserts this on every generated board, not by construction trust).

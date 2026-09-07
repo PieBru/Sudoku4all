@@ -1030,6 +1030,101 @@
         };
       }
 
+      /* ============ Training generator (spec 010) — pure logic, no DOM ============ */
+      /* Two-phase carve from genFull under solveWithAllowed exclusivity.
+         Phase A: remove shuffled cells while the allowed-set solve still
+         completes, stopping at the level's clue target. Phase B (only when a
+         non-single technique is checked): keep removing until one contributes
+         or nothing removable is left. Tripwire: any completed carve that is
+         not a unique-solution board means a detector is UNSOUND — abort
+         loudly, never retry (engine-bug path). */
+      const TRAIN_BUDGET_MSG =
+        "Couldn't build a board with only these techniques. Try enabling a few more.";
+      function generateTrainingBoard(allowedIds, targetClues, caps) {
+        const C = Object.assign(
+          { attempts: 8, wallMs: 5000, runsPerAttempt: 120 },
+          caps || {},
+        );
+        const t0 = Date.now();
+        const nonSingles = allowedIds.filter(
+          (t) => t !== "naked_single" && t !== "hidden_single",
+        );
+        let lastErr = null;
+        for (let attempt = 1; attempt <= C.attempts; attempt++) {
+          if (Date.now() - t0 > C.wallMs)
+            throw new Error(TRAIN_BUDGET_MSG + " (time budget)");
+          const sol = genFull();
+          const board = sol.slice();
+          const order = shuffle([...Array(N).keys()]);
+          let runs = 0;
+          let clues = 81;
+          let cursor = 0; /* never re-try a failed cell within one attempt */
+          const removable = () => {
+            while (cursor < order.length) {
+              const i = order[cursor++];
+              if (!board[i]) continue;
+              if (Date.now() - t0 > C.wallMs)
+                throw new Error(TRAIN_BUDGET_MSG + " (time budget)");
+              if (runs >= C.runsPerAttempt) return null; /* attempt budget out */
+              const keep = board[i];
+              board[i] = 0;
+              runs++;
+              const r = solveWithAllowed(board, allowedIds);
+              if (r.completed) {
+                clues--;
+                return { i, r };
+              }
+              board[i] = keep;
+            }
+            return null;
+          };
+          /* Phase A: carve to target */
+          while (clues > targetClues) {
+            const step = removable();
+            if (!step) break;
+          }
+          if (clues > targetClues) { lastErr = "carve-stall"; continue; }
+          /* Phase B: exercise bias past target until a non-single contributes */
+          if (nonSingles.length) {
+            for (;;) {
+              const step = removable();
+              if (!step) break;
+              if (step.r.used.some((t) => nonSingles.includes(t))) break;
+            }
+          }
+          /* final verification on the pristine board (FR-003) */
+          if (runs >= C.runsPerAttempt) {
+            /* one run left needed for verification inside budget: not counted
+               as carve; use a fresh check outside the carve budget */
+          }
+          const ver = solveWithAllowed(board, allowedIds);
+          const cnt = countSolutions(board, 2);
+          if (!ver.completed || cnt !== 1 || !ver.board.every((v, i) => v === sol[i])) {
+            throw new Error(
+              "training soundness tripwire: carve solved but board is not the unique solution (detector bug) — aborting, no retry",
+            );
+          }
+          /* exercise-bias retry: with non-singles checked, a report that used
+             none of them is an attempt failure — retry with a fresh grid */
+          if (nonSingles.length && !ver.used.some((t) => nonSingles.includes(t))) {
+            lastErr = "exercise-bias";
+            continue;
+          }
+          const given = board.map((v) => v !== 0);
+          return {
+            board,
+            solution: sol,
+            given,
+            clues,
+            report: ver.used, /* solver's own cheapest-first path, pristine board */
+            attemptsUsed: attempt,
+          };
+        }
+        throw new Error(
+          TRAIN_BUDGET_MSG + (lastErr ? " (" + lastErr + ")" : " (attempts)"),
+        );
+      }
+
       /* ================= DOM / UI ================= */
       if (typeof document !== "undefined" && document.getElementById("grid"))
         (function () {

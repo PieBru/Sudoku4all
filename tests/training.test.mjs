@@ -7,10 +7,10 @@ import assert from "node:assert/strict";
 
 const html = readFileSync(new URL("../sudoku.html", import.meta.url), "utf8");
 const js = html.match(/<script>([\s\S]*)<\/script>/)[1];
-const { N, GROUPS, TRAIN_TECHNIQUES, solveWithAllowed, countSolutions, genFull, makePuzzle } =
+const { N, GROUPS, TRAIN_TECHNIQUES, solveWithAllowed, countSolutions, genFull, makePuzzle, generateTrainingBoard, TRAIN_BUDGET_MSG, trainDetectors } =
   Function(
     js +
-      ";return {N,GROUPS,TRAIN_TECHNIQUES,solveWithAllowed,countSolutions,genFull,makePuzzle};",
+      ";return {N,GROUPS,TRAIN_TECHNIQUES,solveWithAllowed,countSolutions,genFull,makePuzzle,generateTrainingBoard,TRAIN_BUDGET_MSG,trainDetectors};",
   )();
 
 /* independent brute-force solver (oracle): returns the first solution of a
@@ -129,5 +129,71 @@ const t0 = Date.now();
 const re = solveWithAllowed(new Array(81).fill(0), SINGLES);
 assert.ok(Date.now() - t0 < 100 && !re.completed);
 console.log("loop guards: empty board returns fast");
+
+/* ============ spec 010: generator gate ============ */
+const BASIC = ["naked_pair", "naked_triple", "naked_quad", "hidden_pair", "hidden_triple", "hidden_quad", "pointing", "claiming"];
+const INTER = ["x_wing", "swordfish", "jellyfish", "skyscraper", "two_string_kite", "turbot_fish", "xy_wing", "xyz_wing", "w_wing"];
+let gs = 1234; /* seeded RNG: reproducible gate */
+const grand = () => { gs = (gs * 1103515245 + 12345) & 0x7fffffff; return gs / 0x7fffffff; };
+const dropN = (arr, n) => {
+  const a = arr.slice();
+  for (let k = 0; k < n; k++) a.splice((grand() * a.length) | 0, 1);
+  return a;
+};
+/* SC-001: random checked subsets across levels; every generated board
+   completes under its subset alone, within the wall-clock guard */
+let boards = 0, tStart = Date.now();
+for (let it = 0; it < 40 && boards < 12; it++) {
+  const inter = grand() < 0.5;
+  const level = inter ? INTER : BASIC;
+  const drops = grand() < 0.5 ? 1 : 2;
+  const checked = [...SINGLES, ...dropN(level, drops)];
+  const target = inter ? 29 : 34;
+  let res;
+  try { res = generateTrainingBoard(checked, target); }
+  catch { continue; } /* a starved subset may loudly exhaust its budget: redraw */
+  const again = solveWithAllowed(res.board, checked);
+  assert.ok(again.completed, "SC-001: board must complete under its subset alone");
+  assert.ok(again.board.every((v, i) => v === res.solution[i]), "SC-001: completion = solution");
+  assert.ok(res.clues <= target, `SC-001: clue floor violated (${res.clues} > ${target})`);
+  assert.equal(countSolutions(res.board, 2), 1, "SC-001: unique solution");
+  assert.deepEqual(res.given, res.board.map((v) => v !== 0), "SC-001: given flags match board");
+  boards++;
+}
+assert.ok(boards >= 12, `SC-001: only ${boards} subsets generated`);
+console.log(`SC-001: ${boards} random-subset boards verified exclusive + unique`);
+
+/* SC-002: default Basic checks — at least 4 of 5 reports include a non-single */
+let nonSingleReports = 0;
+for (let k = 0; k < 5; k++) {
+  const r = generateTrainingBoard([...SINGLES, ...BASIC], 34);
+  if (r.report.some((t) => BASIC.includes(t))) nonSingleReports++;
+}
+assert.ok(nonSingleReports >= 4, `SC-002: only ${nonSingleReports}/5 reports with non-single`);
+console.log(`SC-002: default Basic exercise-bias ${nonSingleReports}/5`);
+
+/* FR-004: budget exhaustion fails loudly with the exact message, no board */
+let threw = null;
+try { generateTrainingBoard(SINGLES, 34, { attempts: 1, runsPerAttempt: 3, wallMs: 2000 }); }
+catch (e) { threw = e.message; }
+assert.ok(threw !== null && threw.startsWith(TRAIN_BUDGET_MSG), `budget message wrong: ${threw}`);
+console.log("budget exhaustion: exact message, no board returned");
+
+/* FR-003: tripwire — an unsound detector that completes boards wrongly must
+   abort loudly with no retry (planted at test time, then restored) */
+{
+  const real = trainDetectors.pointing;
+  trainDetectors.pointing = () => ({ place: [0, 9] }); /* always place 9 at r1c1 */
+  let tripped = null;
+  try { generateTrainingBoard([...SINGLES, ...BASIC], 34); }
+  catch (e) { tripped = e.message; }
+  trainDetectors.pointing = real;
+  assert.ok(tripped !== null, "tripwire: unsound detector must abort");
+  assert.ok(/tripwire/.test(tripped), `tripwire message wrong: ${tripped}`);
+  /* and after restore, generation works again (no retry state leaked) */
+  const ok = generateTrainingBoard([...SINGLES, ...BASIC], 34);
+  assert.ok(ok.clues <= 34);
+  console.log("tripwire: unsound detector aborted loudly, restore clean");
+}
 
 console.log("training tests: all pass");
