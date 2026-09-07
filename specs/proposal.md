@@ -7,7 +7,8 @@ pages: the curriculum map, the one-page-per-chapter rule, the language rules
 (including "a 6-year-old can read the Beginner page"), and a full breakdown of
 the slim specs to create next.
 
-**Status**: proposal v1. §8 lists the decisions this document seals; any of
+**Status**: proposal v2 (v2 adds the fun-size intro ladder — §3.1 and
+Appendix D). §8 lists the decisions this document seals; any of
 them can be vetoed before the specs are cut, otherwise they stand.
 
 ---
@@ -33,6 +34,7 @@ Two artifacts deliver this:
 | Human-friendly language; Beginner readable by a 6-year-old | Language rules L1–L6 (§4), enforced by a runnable gate (§7) |
 | If a page is too big, one page per chapter; begin with the Beginner page | Chapter split (§3) + build order (§5, Beginner is spec 001) |
 | An introductory step for kids and Sudoku-shy adults | Chapter `00-first-steps` (§3), its own spec (002) |
+| First contact must be fun, not fear: simplified smaller boards teach row / column / cell / box by playing | Fun-size ladder (§3.1), delivered by spec 002 via `lessons/mini.js` |
 
 The Brief itself (158 lines) fits any context comfortably; the one-page rule
 applies to the *user-facing lesson pages*, which is where size actually
@@ -45,7 +47,7 @@ them). Each is one page under `lessons/`.
 
 | Page | Working title | Audience | Source (Brief section) | You graduate when… |
 | --- | --- | --- | --- | --- |
-| `00-first-steps.html` | *Sudoku? Hello!* | kids 6+, first-timers, adults who fear its complexity | new content (the Brief starts one rung up) + the app's own UI | you can say the one rule, point at a row / column / box, start a new game in the app, and use Undo without fear |
+| `00-first-steps.html` | *Sudoku? Hello!* | kids 6+, first-timers, adults who fear its complexity | new content (the Brief starts one rung up) + fun-size boards (§3.1) + the app's own UI | you solved a 4×4 and a 6×6 board all by yourself, you can point at a row / column / box / cell, and starting a real 9×9 game in the app feels friendly |
 | `01-beginner.html` | *Your first two tricks* | beginners | Tier 1 — scanning/cross-hatching, full house, hidden single, naked single | you can solve an easy puzzle using scanning and cross-hatching on your own |
 | `02-basic.html` | *Pairs that talk to each other* | easy-level solvers | Tier 2 — naked/hidden pairs→quads, pointing, claiming | you can spot a naked pair and a pointing pair on a prepared board |
 | `03-intermediate.html` | *Patterns with funny names* | medium-level solvers | Tier 3 — fish, single-digit patterns, wings, uniqueness, Sue de Coq, remote pairs | you can find an X-Wing and a UR type 1 on prepared boards |
@@ -55,6 +57,37 @@ them). Each is one page under `lessons/`.
 Chapter 00 deliberately repeats nothing from chapter 01: it teaches **what
 the game is and how to hold the pencil** (literally: how to click, type,
 undo, and write notes in the app), not any solving technique.
+
+### 3.1 Chapter 00 internals — the fun-size ladder
+
+First contact is play, never a wall of 81 squares. Chapter 00 teaches the
+main concepts — row, column, cell, box — **on boards small enough to win in
+under a minute**, all playable in the page via `lessons/mini.js`:
+
+1. **Fruit 4×4** — 2×2 boxes, four fruit symbols (🍎 🍌 🍇 🍓) instead of
+   any digits. The very first win proves "this is not math".
+2. **Digit 4×4** — same board, digits 1–4: "the fruits become numbers; the
+   game stays exactly the same."
+3. **Digit 6×6** — 2×3 boxes, digits 1–6: one size up, one new wrinkle
+   (boxes are wide rectangles now).
+4. **Bridge to the real board** — the 6×6 pictured next to a 9×9: "same
+   game, more squares. Press *Learn → play* whenever you feel ready."
+
+Concepts are named *while playing* ("this line is a row; this little square
+is a cell; this thick-bordered chunk is a box — each fruit fits once in
+each"), never in a wall of text before the first game.
+
+mini.js UX (fear-first, hard rules for the spec):
+
+- Tap a cell, then tap a big button holding the digit or fruit (keyboard
+  1–9 also works) — big targets for small fingers.
+- An entry that contradicts the solution wobbles gently and does **not**
+  stick. No mistake counter, no red, no timer — chapter 00 has no failure
+  state at all.
+- Completing a board triggers a small celebration ("You did it! 🎉").
+- Given cells are locked and look pinned, exactly like in the real app.
+
+`ponytail: no contradiction-hunting is taught here — that is chapter 01+'s job; add a strict mode to mini.js only if learners bounce at the 9×9 transition.`
 
 ## 4. Language & tone rules (hard requirements)
 
@@ -95,7 +128,7 @@ along the Brief's sub-family lines.
 | --- | --- | --- | --- | --- |
 | `000-lesson-framework` | `lessons/index.html`, shared `lesson.css`, tiny `board.js` mini-board renderer, page template, Learn link in the app, readability gate test | this proposal | S | — |
 | `001-beginner-lesson` | `lessons/01-beginner.html` (complete) | Brief Tier 1 | M | 000 |
-| `002-first-steps-lesson` | `lessons/00-first-steps.html` (complete) | new + app UI | S | 000 |
+| `002-first-steps-lesson` | `lessons/00-first-steps.html` (complete) + `lessons/mini.js` + 3 gate-validated fun-size puzzles (fruit 4×4, digit 4×4, digit 6×6) | new + app UI | M | 000 |
 | `003-basic-lesson` | `lessons/02-basic.html` (complete) | Brief Tier 2 | M | 000 |
 | `004-intermediate-fish` | page shell + fish family + single-digit pattern sections of `03-intermediate.html` | Brief Tier 3 (first half) | M | 000 |
 | `005-intermediate-wings` | wings + uniqueness + Sue de Coq + remote pairs sections (completes the page) | Brief Tier 3 (second half) | M | 004 |
@@ -135,7 +168,8 @@ links — because the Brief itself says almost no human uses these routinely.
 
 ### 5.2 Scope fences (YAGNI, stated so no spec drifts)
 
-- No JS in lesson pages beyond `board.js`.
+- No JS in lesson pages beyond `board.js` (static display boards, all
+  chapters) and `mini.js` (playable fun-size boards, chapter 00 only).
 - No app changes beyond the Learn link. "Try it" cannot deep-start a
   difficulty (the app resumes the saved game; deep-linking would fight
   localStorage) — a text instruction suffices.
@@ -156,7 +190,7 @@ principles plus the app's UI, and its spec says so explicitly.
 | Gate | Command | Applies to |
 | --- | --- | --- |
 | Readability | `node tests/readability.test.mjs` | every lesson page: chapters 00/01 → max sentence ≤ 15 words, average ≤ 10, banned-jargon list absent outside *For grown-ups* asides; chapters 02+ → max sentence ≤ 25 words |
-| Lesson page boot | `uv run python tests/lessons.test.py` (Playwright) | 0 page errors, template sections present, nav links resolve, mini-boards render 81 cells |
+| Lesson page boot | `uv run python tests/lessons.test.py` (Playwright) | 0 page errors, template sections present, nav links resolve, mini-boards render 81 cells; chapter 00 additionally: every `.mini` validates (Appendix D) and is playable — tap a button to place a digit, a contradicting entry wobbles and does not stick, a full solve shows the celebration |
 | App untouched | `node tests/engine.test.mjs` and `uv run python tests/browser.test.py` | stay green; only the Learn link may differ in the app |
 
 `ponytail:` the readability check uses a naive sentence splitter (split on
@@ -171,6 +205,7 @@ principles plus the app's UI, and its spec says so explicitly.
 5. "Try it" links with a text instruction; no deep-linking into the app.
 6. The Brief is the technique source of truth; lessons never contradict it.
 7. Build order: framework → Beginner → First Steps → Basic → Intermediate → Advanced → Extreme.
+8. Chapter 00 teaches row / column / cell / box by playing fun-size boards (fruit 4×4 → digit 4×4 → 6×6 → 9×9 bridge) via `lessons/mini.js`; contradictions wobble and never stick — the intro has no failure state.
 
 ---
 
@@ -231,3 +266,23 @@ pairs, any Tier 2+ technique, app changes.
   puzzle all by yourself? → No: start at chapter 1. Yes: go to chapter 2.")
 - "Start here" badge on chapter 00 for first-timers and on chapter 01 for
   players who already know the rules.
+
+## Appendix D — fun-size boards: data format and gate
+
+Puzzles are pure data — no solver ships in the lessons:
+
+```html
+<div class="mini" data-size="4" data-box="2,2"
+     data-puzzle="1.34341..14343.1"
+     data-solution="1234341221434321"
+     data-symbols="🍎,🍌,🍇,🍓"></div>
+```
+
+- `mini.js` renders the grid, takes input, and compares against
+  `data-solution`. Omit `data-symbols` for digits.
+- The example pair above is real: solution verified as a valid 4×4 grid and
+  the puzzle verified to have exactly one solution (checked 2026-09-07).
+- The gate validates every `.mini` on the page the same way: solution is a
+  valid grid (each symbol once per row, column, box), puzzle is consistent
+  with the solution, and the puzzle has exactly one solution (brute force —
+  trivial at 4×4/6×6). A hand-typo'd puzzle can never ship.
