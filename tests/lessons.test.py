@@ -106,8 +106,10 @@ class Collector(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
-        if tag == "div" and "board" in (a.get("class") or ""):
-            self.boards.append((a.get("class") or "", a))
+        if tag == "div":
+            cls = (a.get("class") or "").split()
+            if "board" in cls or "mini" in cls:
+                self.boards.append((a.get("class") or "", a))
         if tag == "a" and "href" in a:
             self.hrefs.append(a["href"])
         if "data-part" in a:
@@ -156,7 +158,7 @@ for page in pages:
                 f"full={full}",
             )
     for cls, a in c.boards:
-        if "mini" in cls:
+        if "mini" in cls.split():
             size = int(a.get("data-size", "0") or "0")
             bb = str(a.get("data-box", "3,3") or "3,3").split(",")
             brows, bcols = int(bb[0]), int(bb[1])
@@ -174,7 +176,27 @@ for page in pages:
             if ch.isdigit() and ch != "0"
         }
         ok, nsol = count_solutions(cells, size, brows, bcols)
-        if "data-fragment" in a:
+        if "mini" in cls.split():
+            # spec 002 / Appendix D: solution valid + puzzle agrees + unique
+            sols = str(a.get("data-solution", "") or "")
+            scells = {
+                (i // size, i % size): int(ch)
+                for i, ch in enumerate(sols)
+                if ch.isdigit() and ch != "0"
+            }
+            units = units_for(size, brows, bcols)
+            sol_ok = all(
+                len({v for c in u if (v := scells.get(c))})
+                == sum(1 for c in u if c in scells)
+                for u in units
+            )
+            agrees = all(scells.get(k) == v for k, v in cells.items())
+            check(
+                f"mini data valid [{page.name}] size={size}",
+                ok and nsol == 1 and sol_ok and agrees,
+                f"consistent={ok} solutions={nsol} sol_valid={sol_ok} agrees={agrees}",
+            )
+        elif "data-fragment" in a:
             check(
                 f"fragment consistent [{page.name}]",
                 ok,
@@ -199,7 +221,6 @@ if idx.exists():
     )
 
 # ---------- live browser checks ---------------------------------------------
-
 with sync_playwright() as p:
     b = p.chromium.launch()
     ctx = b.new_context()
@@ -229,6 +250,51 @@ with sync_playwright() as p:
                 br_count >= 18,
                 f"bR={br_count}",
             )
+        pg.close()
+
+    # spec 002: mini boards are really playable — drive the fruit 4x4
+    f00 = LESSONS / "00-first-steps.html"
+    if f00.exists():
+        pg = ctx.new_page()
+        errs: list = []
+        pg.on("pageerror", lambda e, sink=errs: sink.append(str(e)))
+        pg.goto(f00.as_uri())
+        pg.wait_for_timeout(200)
+        mini = pg.locator(".mini").first
+        sol = mini.get_attribute("data-solution") or ""
+        puz = mini.get_attribute("data-puzzle") or ""
+        empties = [i for i, ch in enumerate(puz) if ch == "."]
+        cells = pg.locator(".mgrid .cell")
+        # wrong pick first: must wobble and never stick, with no red state
+        i0 = empties[0]
+        wrong = next(d for d in "1234" if d != sol[i0])
+        cells.nth(i0).click()
+        mini.locator(f'.mkey[data-k="{wrong}"]').click()
+        pg.wait_for_timeout(120)
+        cls = cells.nth(i0).get_attribute("class") or ""
+        txt = cells.nth(i0).text_content()
+        check(
+            "mini wrong pick wobbles, never sticks",
+            "bump" in cls and not txt and "wrong" not in cls,
+            f"class={cls} text={txt!r}",
+        )
+        for i in empties:
+            cells.nth(i).click()
+            pg.keyboard.press(sol[i])
+        note = mini.locator(".mnote").text_content()
+        check("mini completion celebrates", "You did it" in (note or ""), repr(note))
+        # size-aware keys: 5 must not land on a 4x4
+        m2 = pg.locator(".mini").nth(1)
+        puz2 = m2.get_attribute("data-puzzle") or ""
+        j0 = next(i for i, ch in enumerate(puz2) if ch == ".")
+        m2.locator(".cell").nth(j0).click()
+        pg.keyboard.press("5")
+        check(
+            "mini keys size-aware (5 rejected on 4x4)",
+            not m2.locator(".cell").nth(j0).text_content(),
+            repr(m2.locator(".cell").nth(j0).text_content()),
+        )
+        check("mini page: no errors", not errs, str(errs[:2]))
         pg.close()
 
     pg = ctx.new_page()

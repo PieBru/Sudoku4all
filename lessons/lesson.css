@@ -150,3 +150,46 @@ footer[data-part="footer"] {
   display: inline-block; margin-bottom: 1rem;
   text-decoration: none; color: var(--accent); font-size: 0.95rem;
 }
+
+/* --- playable fun-size boards (mini.js, chapter 00) ---------------- */
+
+.miniWrap { margin: 1rem 0; }
+.mgrid {
+  display: grid;
+  grid-template-columns: repeat(var(--msize), 1fr);
+  width: min(300px, 100%);
+  background: var(--board);
+  border: 2px solid var(--thick);
+}
+.mgrid .cell {
+  aspect-ratio: 1; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line);
+  background: transparent; color: var(--user);
+  font: 700 1.25rem/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.mgrid .cell.bR { border-right: 2px solid var(--thick); }
+.mgrid .cell.bB { border-bottom: 2px solid var(--thick); }
+.mgrid .cell.given { color: var(--given); cursor: default; }
+.mgrid .cell.sel { background: var(--sel); }
+.mgrid .cell.done { color: var(--user); }
+.mgrid .cell.bump { animation: wiggle 0.35s ease; }
+@keyframes wiggle {
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.mgrid.party { animation: bounce 0.6s ease; }
+@keyframes bounce {
+  30% { transform: translateY(-8px); }
+  60% { transform: translateY(3px); }
+}
+.mbar { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.6rem; }
+.mkey {
+  min-width: 2.4rem; padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); color: var(--ink);
+  font: 700 1.3rem/1 system-ui, sans-serif; cursor: pointer;
+}
+.mkey:hover { border-color: var(--accent); }
+.mnote { min-height: 1.7em; margin: 0.5rem 0 0; font-weight: 700; }

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chapter 00 — Hello, Sudoku!</title>
+    <link rel="stylesheet" href="lesson.css" />
+  </head>
+  <body>
+    <a class="back" href="index.html">&#9664; All chapters</a>
+    <header>
+      <h1>Chapter 00 &middot; Hello, Sudoku!</h1>
+      <p class="sub">Tiny boards. Big fun. No pressure.</p>
+    </header>
+
+    <nav data-part="ladder" aria-label="Chapters">
+      <ol>
+        <li class="here">00 Hello!</li>
+        <li>01 First tricks</li>
+        <li>02 Pairs</li>
+        <li>03 Funny patterns</li>
+        <li>04 Deep logic</li>
+        <li>05 The map</li>
+      </ol>
+    </nav>
+
+    <section data-part="learn">
+      <h2>First, breathe</h2>
+      <p>
+        Sudoku looks scary. It is not. These pages never time you. They never
+        count mistakes. Mistakes are normal. Everyone makes them.
+      </p>
+      <p>
+        The real game has a clock. It only reports your time. It never rushes
+        you. The game counts mistakes. It never punishes you. Undo always
+        rescues you. Here you cannot fail. Really.
+      </p>
+    </section>
+
+    <section data-part="body">
+      <section>
+        <h2>What is this game?</h2>
+        <p>
+          A Sudoku is a big square. Lines across are rows. Lines down are
+          columns. Each small square is a cell. Fat lines cut big boxes.
+        </p>
+        <p>
+          One rule fills them all. Each row holds every fruit once. Each
+          column too. Each box too. That is the whole game!
+        </p>
+        <aside class="grownups">
+          <p>
+            Grown-ups: these small grids are real Sudoku in miniature — same
+            rules, friendlier size. Early wins matter more than speed, so
+            nothing here counts, times, or judges.
+          </p>
+        </aside>
+      </section>
+
+      <section>
+        <h2>Play with fruit</h2>
+        <p>
+          Tap a square. Tap a fruit. Wrong fruit? It wiggles away. Nothing
+          bad happens. Fill every square to win.
+        </p>
+        <div
+          class="mini"
+          data-size="4"
+          data-box="2,2"
+          data-symbols="🍎🍌🍇🍊"
+          data-puzzle="..21.134.243.412"
+          data-solution="4321213412433412"
+          role="group"
+          aria-label="Playful four by four fruit board"
+        ></div>
+      </section>
+
+      <section>
+        <h2>Now with numbers</h2>
+        <p>
+          Numbers now. Same game. Each row, column and box holds 1 to 4.
+          Grown squares stay locked. Fill the rest.
+        </p>
+        <div
+          class="mini"
+          data-size="4"
+          data-box="2,2"
+          data-puzzle="41....411.343.12"
+          data-solution="4123234112343412"
+          role="group"
+          aria-label="Playable four by four number board"
+        ></div>
+      </section>
+
+      <section>
+        <h2>A bit bigger</h2>
+        <p>
+          Six by six now. Still friendly. Rows and columns hold 1 to 6. Boxes
+          are two rows tall. Take your time.
+        </p>
+        <div
+          class="mini"
+          data-size="6"
+          data-box="2,3"
+          data-puzzle="6....2..346.24.5.63.5.2.5326.1.1...."
+          data-solution="654312123465241536365124532641416253"
+          role="group"
+          aria-label="Playable six by six number board"
+        ></div>
+        <aside class="grownups">
+          <p>
+            Grown-ups: the number keys are size-aware — 1 to 4 on the small
+            boards, 1 to 6 here. Wrong picks only wiggle; correct picks stay.
+          </p>
+        </aside>
+      </section>
+
+      <section>
+        <h2>The big one</h2>
+        <p>
+          The big board works the same. Rows, columns and boxes. Just nine of
+          each. You are ready when the little ones feel easy.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-givens="700400009514609030069070401080006910000890000001250008050140720308567190000003865"
+            role="img"
+            aria-label="A real easy nine by nine Sudoku board"
+          ></div>
+          <figcaption>Scary? No. Just nine tiny games in one.</figcaption>
+        </figure>
+      </section>
+    </section>
+
+    <section data-part="try">
+      <h2>Try it</h2>
+      <p>
+        Finish one tiny board alone. Then finish a second. Then finish the
+        six by six. Then <a href="../sudoku.html">peek at the big game</a>.
+        Easy level is your friend.
+      </p>
+    </section>
+
+    <section data-part="checkpoint">
+      <h2>Checkpoint</h2>
+      <p>Can you do these three things?</p>
+      <ol>
+        <li>Say what a row is.</li>
+        <li>Say what a box is.</li>
+        <li>Finish a tiny board alone.</li>
+      </ol>
+      <p>You graduate when both boards fall without help.</p>
+    </section>
+
+    <footer data-part="footer">
+      <p>
+        <a href="01-beginner.html">Chapter 01 is ready — read it</a>.
+        <a href="index.html">All chapters</a>.
+        <a href="../sudoku.html">Play the game</a>.
+      </p>
+    </footer>
+
+    <script src="board.js"></script>
+    <script src="mini.js"></script>
+  </body>
+</html>

@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal.md §3 (chapter 00 row), §3.1 (fun-size ladder + mini.js UX), §4 (L1, L2, L4, L6), §5 (row `002-first-steps-lesson`), §7, Appendix D
 
