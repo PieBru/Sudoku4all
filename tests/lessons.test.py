@@ -21,7 +21,11 @@ PAGE_RULES = {
     "01-beginner.html": {
         "techniques": ["crosshatching", "full_house", "hidden_single", "naked_single"],
         "full_boards_min": 2,
-    }
+    },
+    "02-basic.html": {
+        "techniques": ["naked_pair", "hidden_pair", "pointing", "claiming"],
+        "full_boards_min": 0,
+    },
 }
 fails = []
 
@@ -208,6 +212,28 @@ for page in pages:
                 ok and nsol == 1,
                 f"consistent={ok} solutions={nsol}",
             )
+        # candidate truth: any shown notes must be legal for that cell
+        # (teaching boards may filter a long list down to the focus digits)
+        if size == 9:
+            units9 = units_for(9, 3, 3)
+            cands_attr = str(a.get("data-cands", "") or "")
+            for part in filter(None, cands_attr.split(";")):
+                kv = part.split(":")
+                ci = int(kv[0])
+                cell = (ci // 9, ci % 9)
+                legal = set(range(1, 10))
+                for u in units9:
+                    if cell not in u:
+                        continue
+                    for other in u:
+                        if other != cell and other in cells:
+                            legal.discard(cells[other])
+                shown = {int(d) for d in kv[1] if d.isdigit()}
+                check(
+                    f"cands legal [{page.name}] cell {ci}",
+                    shown <= legal and cells.get(cell, 0) == 0,
+                    f"shown={sorted(shown)} legal={sorted(legal)}",
+                )
 
 idx = LESSONS / "index.html"
 if idx.exists():

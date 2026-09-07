@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chapter 02 — Pairs and intersections</title>
+    <link rel="stylesheet" href="lesson.css" />
+  </head>
+  <body>
+    <a class="back" href="index.html">&#9664; All chapters</a>
+    <header>
+      <h1>Chapter 02 &middot; Pairs and intersections</h1>
+      <p class="sub">The toolkit that unlocks Medium puzzles.</p>
+    </header>
+
+    <nav data-part="ladder" aria-label="Chapters">
+      <ol>
+        <li>00 Hello!</li>
+        <li>01 First tricks</li>
+        <li class="here">02 Pairs</li>
+        <li>03 Funny patterns</li>
+        <li>04 Deep logic</li>
+        <li>05 The map</li>
+      </ol>
+    </nav>
+
+    <section data-part="learn">
+      <h2>What you will learn</h2>
+      <p>
+        A note before we start: this chapter talks to grown-up solvers now, so
+        the wording grows up too. You will meet the pair family — naked pairs,
+        hidden pairs, and their bigger siblings — plus two mirror tricks
+        called pointing and claiming.
+      </p>
+      <p>
+        One new word helps everywhere. A <em>unit</em> is any row, any column,
+        or any 3×3 box — the three places a digit may appear only once. And
+        the small numbers a square could still take are its
+        <em>candidates</em>; in the game they are your <em>notes</em>.
+      </p>
+    </section>
+
+    <section data-part="body">
+      <section data-technique="naked_pair">
+        <h2>Naked pair</h2>
+        <p>
+          A naked pair is two squares in one unit whose candidate lists are
+          exactly the same two digits. Those two digits belong to those two
+          squares — one each, in some order. Every other square in the unit
+          can forget both digits.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="190000000200000000000000000000568000020000000410000000000000000940000000000000000"
+            data-cands="27:37;28:37;29:379"
+            data-hl="27,28"
+            data-hx="29"
+            role="img"
+            aria-label="Board fragment: row four squares one and two hold only candidates 3 and 7; square three loses both"
+          ></div>
+          <figcaption>
+            A teaching fragment. The two highlighted squares show only 3 and
+            7. The third square of the row loses both digits.
+          </figcaption>
+        </figure>
+        <h3>Triples and quads: the same idea, bigger</h3>
+        <p>
+          Nothing changes with more squares. Three squares of one unit
+          carrying only three digits among them make a <em>naked triple</em>;
+          four squares and four digits make a <em>naked quad</em>. Look at the
+          board above and imagine a third square in row 4 holding exactly 3,
+          7 and one more digit — that trio would lock all three digits, and
+          every other row 4 square would lose them.
+        </p>
+      </section>
+
+      <section data-technique="hidden_pair">
+        <h2>Hidden pair</h2>
+        <p>
+          A hidden pair is the same idea seen from the digits' side. Two
+          digits of one unit can only land in the same two squares. Those two
+          squares are now spoken for, so every other candidate inside them
+          can go. The pair was hiding behind extra candidates.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000000000000050000000000000000090000000000000000000713068000509000000000590"
+            data-cands="54:2459;56:2459"
+            data-hl="54,56"
+            data-hx="54,56"
+            role="img"
+            aria-label="Board fragment: in the bottom left box, digits 5 and 9 fit only in row seven squares one and three, which also show candidates 2 and 4"
+          ></div>
+          <figcaption>
+            A teaching fragment. In this box, 5 and 9 fit only in the two
+            highlighted squares — so the 2 and 4 shown there must go.
+          </figcaption>
+        </figure>
+        <p>
+          Hidden triples and quads extend the same way: three digits hiding
+          in three squares, four in four. The sentence to remember: naked
+          pairs start from matching squares, hidden pairs start from trapped
+          digits.
+        </p>
+      </section>
+
+      <section data-technique="pointing">
+        <h2>Pointing</h2>
+        <p>
+          Pointing and claiming are mirror tricks; both are called
+          <em>locked candidates</em>. For pointing, pick a box and a digit. If
+          every place that digit could sit inside the box lies on one row,
+          the box points at that row: the digit must be there — so the rest
+          of the row drops it.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000060000000000000000000600000000000000000000000000000000000000000000000000000000"
+            data-cands="9:6;10:6;11:6;30:6;34:6"
+            data-hl="9,10,11"
+            data-hx="30,34"
+            role="img"
+            aria-label="Board fragment: in the top left box the digit 6 fits only in row two, so the 6s elsewhere in row two are crossed out"
+          ></div>
+          <figcaption>
+            A teaching fragment, digit 6. Inside the box, every 6 candidate
+            sits in row 2 — so the crossed 6s elsewhere in the row must go.
+          </figcaption>
+        </figure>
+        <p>
+          The same works for columns: if the digit's homes line up on one
+          column of the box, the rest of that column drops it.
+        </p>
+      </section>
+
+      <section data-technique="claiming">
+        <h2>Claiming</h2>
+        <p>
+          Claiming runs the mirror: the row forces the box. Pick a row and a
+          digit. If every candidate in the row lies inside one box, the row
+          claims that box — the rest of the box drops the digit.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000000800000000000000000031095000000000000000000000000800000000000000000000"
+            data-cands="27:8;28:8;29:8;37:8;45:8"
+            data-hl="27,28,29"
+            data-hx="37,45"
+            role="img"
+            aria-label="Board fragment: in row four the digit 8 fits only in the left three squares, all inside one box, so the 8s elsewhere in that box are crossed out"
+          ></div>
+          <figcaption>
+            A teaching fragment, digit 8. Row 4's 8s all sit in one box — so
+            the crossed 8s elsewhere in that box must go.
+          </figcaption>
+        </figure>
+        <p>
+          The mirror sentence, one line each: pointing — the box forces the
+          row; claiming — the row forces the box.
+        </p>
+      </section>
+    </section>
+
+    <section data-part="try">
+      <h2>Try it in the game</h2>
+      <p>
+        <a href="../sudoku.html">Open the game</a>, set difficulty to Medium,
+        and press New game. Your first hunt: find one pair — naked or hidden
+        — before anything else. Then find one pointing or claiming pattern
+        and say which it is.
+      </p>
+    </section>
+
+    <section data-part="checkpoint">
+      <h2>Checkpoint</h2>
+      <p>Can you do these three things?</p>
+      <ol>
+        <li>
+          Find the naked pair in a fresh Medium board and say which two
+          squares own their digits.
+        </li>
+        <li>
+          Look at the two fragment boards above: one shows pointing, one
+          shows claiming. Which is which, and why?
+        </li>
+        <li>
+          Say the mirror sentence without looking: who forces whom, in each
+          direction?
+        </li>
+      </ol>
+      <p>
+        You are ready for chapter 03 when a Medium board rarely stalls you.
+      </p>
+    </section>
+
+    <footer data-part="footer">
+      <p>
+        <a href="01-beginner.html">&#9664; Chapter 01</a> &middot;
+        <a href="index.html">All chapters</a> &middot; Chapter 03 is coming
+        soon &middot; <a href="../sudoku.html">Play the game</a>
+      </p>
+    </footer>
+
+    <script src="board.js"></script>
+  </body>
+</html>
