@@ -7,10 +7,10 @@ import assert from "node:assert/strict";
 
 const html = readFileSync(new URL("../sudoku.html", import.meta.url), "utf8");
 const js = html.match(/<script>([\s\S]*)<\/script>/)[1];
-const { N, GROUPS, TRAIN_TECHNIQUES, solveWithAllowed, countSolutions, genFull, makePuzzle, generateTrainingBoard, TRAIN_BUDGET_MSG, trainDetectors } =
+const { GROUPS, TRAIN_TECHNIQUES, solveWithAllowed, countSolutions, makePuzzle, generateTrainingBoard, TRAIN_BUDGET_MSG, trainDetectors } =
   Function(
     js +
-      ";return {N,GROUPS,TRAIN_TECHNIQUES,solveWithAllowed,countSolutions,genFull,makePuzzle,generateTrainingBoard,TRAIN_BUDGET_MSG,trainDetectors};",
+      ";return {GROUPS,TRAIN_TECHNIQUES,solveWithAllowed,countSolutions,makePuzzle,generateTrainingBoard,TRAIN_BUDGET_MSG,trainDetectors};",
   )();
 
 /* independent brute-force solver (oracle): returns the first solution of a
@@ -34,7 +34,7 @@ function bruteSolve(bd) {
     let best = -1, bestC = 10;
     for (let i = 0; i < 81; i++) {
       if (b[i]) continue;
-      let opts = [];
+      const opts = [];
       for (let v = 1; v <= 9; v++) if (okAt(i, v)) opts.push(v);
       if (opts.length < bestC) { best = i; bestC = opts.length; bestOpts = opts; }
       if (bestC === 0) break;
@@ -142,7 +142,7 @@ const dropN = (arr, n) => {
 };
 /* SC-001: random checked subsets across levels; every generated board
    completes under its subset alone, within the wall-clock guard */
-let boards = 0, tStart = Date.now();
+let boards = 0;
 for (let it = 0; it < 40 && boards < 12; it++) {
   const inter = grand() < 0.5;
   const level = inter ? INTER : BASIC;
@@ -163,12 +163,18 @@ for (let it = 0; it < 40 && boards < 12; it++) {
 assert.ok(boards >= 12, `SC-001: only ${boards} subsets generated`);
 console.log(`SC-001: ${boards} random-subset boards verified exclusive + unique`);
 
-/* SC-002: default Basic checks — at least 4 of 5 reports include a non-single */
-let nonSingleReports = 0;
-for (let k = 0; k < 5; k++) {
-  const r = generateTrainingBoard([...SINGLES, ...BASIC], 34);
+/* SC-002: default Basic checks — at least 4 of 5 reports include a non-single.
+   Budget exhaustion is a legal failure mode (spec 010), so collect 5
+   successful builds from up to 10 attempts. */
+let nonSingleReports = 0, reports = 0;
+for (let k = 0; k < 10 && reports < 5; k++) {
+  let r;
+  try { r = generateTrainingBoard([...SINGLES, ...BASIC], 34); }
+  catch { continue; } /* budget: legal, just not a report */
+  reports++;
   if (r.report.some((t) => BASIC.includes(t))) nonSingleReports++;
 }
+assert.ok(reports === 5, `SC-002: only ${reports} successful builds in 10 attempts`);
 assert.ok(nonSingleReports >= 4, `SC-002: only ${nonSingleReports}/5 reports with non-single`);
 console.log(`SC-002: default Basic exercise-bias ${nonSingleReports}/5`);
 

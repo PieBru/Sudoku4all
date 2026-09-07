@@ -9,7 +9,9 @@
 (() => {
   
   try {
-    var t = JSON.parse(localStorage.getItem("sudoku-theme-v1") || "null");
+    /* the app stores a bare string ("dark"); accept JSON too for safety */
+    var raw = localStorage.getItem("sudoku-theme-v1"), t = null;
+    try { t = JSON.parse(raw || "null"); } catch (e) { t = raw; }
     if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
   } catch (e) {
     /* private mode or blocked storage: system theme is fine */

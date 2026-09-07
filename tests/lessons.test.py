@@ -378,6 +378,18 @@ with sync_playwright() as p:
         check("mini page: no errors", not errs, str(errs[:2]))
         pg.close()
 
+    # theme sync: an explicit dark choice in the app follows the reader
+    # into the lesson pages (board.js reads sudoku-theme-v1)
+    tp = ctx.new_page()
+    tp.goto((LESSONS / "index.html").as_uri())
+    tp.evaluate("localStorage.setItem('sudoku-theme-v1', 'dark')")
+    tp.goto((LESSONS / "02-basic.html").as_uri())
+    tp.wait_for_timeout(150)
+    th = tp.evaluate("document.documentElement.dataset.theme || ''")
+    bg = tp.evaluate("getComputedStyle(document.body).backgroundColor")
+    check("lesson pages follow the app's dark theme", th == "dark", f"theme={th!r} bg={bg}")
+    tp.close()
+
     pg = ctx.new_page()
     errs: list = []
     pg.on("pageerror", lambda e, sink=errs: sink.append(str(e)))
