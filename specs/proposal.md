@@ -7,9 +7,18 @@ pages: the curriculum map, the one-page-per-chapter rule, the language rules
 (including "a 6-year-old can read the Beginner page"), and a full breakdown of
 the slim specs to create next.
 
-**Status**: proposal v2 (v2 adds the fun-size intro ladder — §3.1 and
-Appendix D). §8 lists the decisions this document seals; any of
-them can be vetoed before the specs are cut, otherwise they stand.
+Sibling: `specs/proposal-training.md` — the Training Studio (practice boards
+for exactly the techniques this ladder teaches). Both documents take their
+technique names from the Brief, so lessons and studio never disagree.
+
+**Status**: proposal v3. v2 added the fun-size intro ladder (§3.1, Appendix
+D). v3 is the post-cut adversarial revision: the slim specs below were
+cut and committed as `specs/000`–`specs/008` on 2026-09-07 — where they
+refined a rule of this document, v3 records the supersession instead of
+leaving stale wording behind (footer links, §5.1 and Appendix B item 8);
+it also fixes the §7 gate's stale "81 cells" claim and makes the L4
+fear-killers honest about the app's clock and mistake counter. §8 lists
+the decisions this document seals.
 
 ---
 
@@ -49,7 +58,7 @@ them). Each is one page under `lessons/`.
 | --- | --- | --- | --- | --- |
 | `00-first-steps.html` | *Sudoku? Hello!* | kids 6+, first-timers, adults who fear its complexity | new content (the Brief starts one rung up) + fun-size boards (§3.1) + the app's own UI | you solved a 4×4 and a 6×6 board all by yourself, you can point at a row / column / box / cell, and starting a real 9×9 game in the app feels friendly |
 | `01-beginner.html` | *Your first two tricks* | beginners | Tier 1 — scanning/cross-hatching, full house, hidden single, naked single | you can solve an easy puzzle using scanning and cross-hatching on your own |
-| `02-basic.html` | *Pairs that talk to each other* | easy-level solvers | Tier 2 — naked/hidden pairs→quads, pointing, claiming | you can spot a naked pair and a pointing pair on a prepared board |
+| `02-basic.html` | *Pairs that talk to each other* | easy-level solvers | Tier 2 — naked/hidden pairs→quads, pointing, claiming | you can spot a naked pair and a pointing pattern on a prepared board |
 | `03-intermediate.html` | *Patterns with funny names* | medium-level solvers | Tier 3 — fish, single-digit patterns, wings, uniqueness, Sue de Coq, remote pairs | you can find an X-Wing and a UR type 1 on prepared boards |
 | `04-advanced.html` | *Chains: following clues* | hard-level solvers | Tier 4 — AIC, coloring, XY-chains, 3D Medusa, ALS, forcing nets… | you can follow a worked AIC chain and find an XY-Wing on a prepared board |
 | `05-extreme.html` | *Champion territory: a map, not a manual* | the curious | Tier 5 + champion layer | you know the names, why they exist, and where to read more |
@@ -71,7 +80,8 @@ under a minute**, all playable in the page via `lessons/mini.js`:
 3. **Digit 6×6** — 2×3 boxes, digits 1–6: one size up, one new wrinkle
    (boxes are wide rectangles now).
 4. **Bridge to the real board** — the 6×6 pictured next to a 9×9: "same
-   game, more squares. Press *Learn → play* whenever you feel ready."
+   game, more squares. Use this page's *Try it* link whenever you feel
+   ready."
 
 Concepts are named *while playing* ("this line is a row; this little square
 is a cell; this thick-bordered chunk is a box — each fruit fits once in
@@ -79,8 +89,9 @@ each"), never in a wall of text before the first game.
 
 mini.js UX (fear-first, hard rules for the spec):
 
-- Tap a cell, then tap a big button holding the digit or fruit (keyboard
-  1–9 also works) — big targets for small fingers.
+- Tap a cell, then tap a big button holding the digit or fruit (number
+  keys work too — 1–4 on a 4×4, 1–6 on a 6×6) — big targets for small
+  fingers.
 - An entry that contradicts the solution wobbles gently and does **not**
   stick. No mistake counter, no red, no timer — chapter 00 has no failure
   state at all.
@@ -103,17 +114,22 @@ mini.js UX (fear-first, hard rules for the spec):
 - **L2 — dual audience.** Every section of chapters 00/01 carries a small
   *For grown-ups* aside (1–3 sentences, adult tone, may use the real jargon).
   Adults get the precise version without being babied by the main text.
-- **L3 — plain English (chapters 02+).** Sentence ceiling ~25 words; every
+- **L3 — plain English (chapters 02+).** Sentence ceiling 25 words; every
   new term gets definition + example at first use; technique names match the
   Brief exactly (X-Wing, not "cross thing").
-- **L4 — fear-killers required in chapter 00**, stated up front: no math is
-  needed; nothing is timed unless you ask; Undo and Hint always exist; the
-  game never judges you.
+- **L4 — fear-killers required in chapter 00**, stated up front and honest
+  about the app: no math is needed; the lessons themselves are never timed
+  and never count mistakes; Undo and Hint always exist. The real game does
+  measure — its clock only reports how fast you were and never rushes you,
+  and it counts mistakes without punishing one (nothing is lost; Undo
+  always rescues). Chapter 00 says this plainly instead of promising a
+  timer-free game the app cannot deliver — the ladder leaves the app
+  untouched (§5.2).
 - **L5 — the gate makes L1/L3 testable, not vibes**: a tiny readability test
   (§7) enforces sentence budgets and a banned-jargon list per chapter.
 - **L6 — terminology matches the app UI**: lesson pages use the same words
-  the app shows (notes, hint, mistakes, New game, Restart), so the learner is
-  never lost when they switch from lesson to game.
+the app shows (notes, hint, mistakes, New game, Restart puzzle), so the
+learner is never lost when they switch from lesson to game.
 
 ## 5. Slim spec plan
 
@@ -139,7 +155,9 @@ along the Brief's sub-family lines.
 **Build order** = spec number order: framework → **Beginner first (user
 directive)** → First Steps → Basic → Intermediate → Advanced → Extreme.
 Chapter numbering (§3) is curriculum order and intentionally differs from
-spec order.
+spec order. Spec numbers 000–008 are consumed by this ladder (cut and
+committed 2026-09-07); `009`–`011` belong to the Training Studio
+(`specs/proposal-training.md`). Future specs start at `012`.
 
 Decision note on chapter 05: we do not teach exocet construction. The extreme
 page is an honest map — names, one-liners from the Brief, why they exist, and
@@ -157,7 +175,9 @@ links — because the Brief itself says almost no human uses these routinely.
                                  "grown-ups call it …" (+ Brief one-liner)
 <section data-part="try">       "Try it": link to ../sudoku.html + one-line instruction
 <section data-part="checkpoint">  2–3 can-you questions (the exit criterion of §3)
-<footer>            prev · index · next
+<footer>            prev · index · next — only links to pages that exist;
+                    missing neighbors render as non-link "coming soon"
+                    markers that later specs flip
 ```
 
 - Mini-boards are rendered by one tiny shared script from compact data
@@ -170,7 +190,9 @@ links — because the Brief itself says almost no human uses these routinely.
 
 - No JS in lesson pages beyond `board.js` (static display boards, all
   chapters) and `mini.js` (playable fun-size boards, chapter 00 only).
-- No app changes beyond the Learn link. "Try it" cannot deep-start a
+- No app changes beyond the Learn link (scope: the ladder specs — the
+  Training Studio track, `specs/proposal-training.md`, changes the app
+  separately under its own gates). "Try it" cannot deep-start a
   difficulty (the app resumes the saved game; deep-linking would fight
   localStorage) — a text instruction suffices.
   `ponytail: no deep-link; add a ?difficulty= handler in the app if learners stumble here.`
@@ -190,7 +212,7 @@ principles plus the app's UI, and its spec says so explicitly.
 | Gate | Command | Applies to |
 | --- | --- | --- |
 | Readability | `node tests/readability.test.mjs` | every lesson page: chapters 00/01 → max sentence ≤ 15 words, average ≤ 10, banned-jargon list absent outside *For grown-ups* asides; chapters 02+ → max sentence ≤ 25 words |
-| Lesson page boot | `uv run python tests/lessons.test.py` (Playwright) | 0 page errors, template sections present, nav links resolve, mini-boards render 81 cells; chapter 00 additionally: every `.mini` validates (Appendix D) and is playable — tap a button to place a digit, a contradicting entry wobbles and does not stick, a full solve shows the celebration |
+| Lesson page boot | `uv run python tests/lessons.test.py` (Playwright) | 0 page errors, template sections present, nav links resolve, and every board renders the cell count for its size — 81 for 9×9 display boards, 16 for `data-size="4"`, 36 for `data-size="6"` — on every lesson page including the index; chapter 00 additionally: every `.mini` validates (Appendix D) and is playable — tap a button to place a digit, a contradicting entry wobbles and does not stick, a full solve shows the celebration |
 | App untouched | `node tests/engine.test.mjs` and `uv run python tests/browser.test.py` | stay green; only the Learn link may differ in the app |
 
 `ponytail:` the readability check uses a naive sentence splitter (split on
@@ -222,6 +244,10 @@ principles plus the app's UI, and its spec says so explicitly.
 contain a digit; their intersections eliminate cells in a box until one
 placement remains [SudokuWiki/HoDoKu, Brief Tier 1].
 
+The sample above sets the prose bar only — it is not board data. Every
+mini-board that ships must be a verified position (real generator output,
+or Appendix-D-validated); spec 001 enforces this.
+
 ## Appendix B — extraction-ready skeleton: `specs/001-beginner-lesson/spec.md`
 
 ```markdown
@@ -247,7 +273,10 @@ full house, hidden single, naked single — each shown on a mini-board.
 6. Checkpoint = the chapter-01 exit criterion of the curriculum map.
 7. Language rules L1 + L6 pass the readability gate.
 8. Footer: prev → lessons/00-first-steps.html, next → lessons/02-basic.html
-   (links may point at not-yet-built pages; index handles that gracefully).
+   — links go **only to pages that exist when the spec lands**; missing
+   neighbors render as non-link "coming soon" markers that later specs
+   flip. (Policy sealed by the cut specs 000–008; supersedes this
+   appendix's v1 wording, which allowed dead links.)
 
 ## Out of scope
 Pencil-mark technique teaching (notes are only named, as the app calls them),
@@ -266,6 +295,9 @@ pairs, any Tier 2+ technique, app changes.
   puzzle all by yourself? → No: start at chapter 1. Yes: go to chapter 2.")
 - "Start here" badge on chapter 00 for first-timers and on chapter 01 for
   players who already know the rules.
+- Parked: a *Play* link in the index header (one click back to
+  `../sudoku.html`). The chapter pages' *Try it* links already cover it;
+  add only if learners get lost.
 
 ## Appendix D — fun-size boards: data format and gate
 
