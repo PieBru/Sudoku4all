@@ -26,6 +26,11 @@ PAGE_RULES = {
         "techniques": ["naked_pair", "hidden_pair", "pointing", "claiming"],
         "full_boards_min": 0,
     },
+    "05-extreme.html": {
+        "techniques": ["tier5", "champion", "path"],
+        "full_boards_min": 0,
+        "required": ["target=\"_blank\""],
+    },
     "04-advanced.html": {
         "techniques": [
             "links",

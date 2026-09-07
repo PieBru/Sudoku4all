@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal.md §3 (chapter 05 row), §4 (L3), §5 (row `008-extreme-map`), §5.1, §7; Brief §Tier 5 + §world-champion layer + learning-ladder table
 

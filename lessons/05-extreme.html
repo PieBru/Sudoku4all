@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chapter 05 — The extreme map</title>
+    <link rel="stylesheet" href="lesson.css" />
+  </head>
+  <body data-page="05-extreme">
+    <header>
+      <p class="crumb"><a href="index.html">Lessons</a> / Chapter 05</p>
+      <h1>Chapter 05 — The extreme map</h1>
+      <p class="lede">
+        Monster territory. Almost nobody solves these techniques by
+        hand — this chapter is a map, not a tutorial.
+      </p>
+    </header>
+
+    <nav data-part="ladder" aria-label="Chapters">
+      <ol>
+        <li><a href="00-first-steps.html">00 Hello!</a></li>
+        <li><a href="01-beginner.html">01 First tricks</a></li>
+        <li><a href="02-basic.html">02 Pairs</a></li>
+        <li><a href="03-intermediate.html">03 Funny patterns</a></li>
+        <li><a href="04-advanced.html">04 Deep logic</a></li>
+        <li class="here">05 The map</li>
+      </ol>
+    </nav>
+
+    <main data-part="body">
+      <section data-part="learn">
+        <h2>Honesty first</h2>
+        <p>
+          Everything past chapter 04 lives on the far edge of the
+          solving world. These techniques appear in magazines' hardest
+          grids and in championship arms races. Solvers meet them a
+          handful of times a year — and even champions reach for them
+          rarely. Learn the names so the map is familiar; let the game
+          you already own do the rest.
+        </p>
+      </section>
+
+      <section data-technique="tier5">
+        <h2>The Tier 5 reference table</h2>
+        <p>
+          One honest line each, faithful to the research brief. No
+          tutorials here — this is the signpost at the edge of town.
+        </p>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>In one line</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Exocet / Double Exocet</td>
+              <td>
+                Four cells share candidates in a special mirrored
+                shape; heavy logic pins which cells hold the digits.
+              </td>
+            </tr>
+            <tr>
+              <td>SK Loop</td>
+              <td>
+                A chain of strong links circling four boxes that
+                removes candidates along its rows and columns.
+              </td>
+            </tr>
+            <tr>
+              <td>MSLS (Multi-Sector Locked Sets)</td>
+              <td>
+                Rows, columns, and boxes balance their candidates so
+                tightly that whole digit sets are forced.
+              </td>
+            </tr>
+            <tr>
+              <td>POM (Pattern Overlay Method)</td>
+              <td>
+                Every complete placement pattern of one digit is
+                listed; cells no pattern uses are dead.
+              </td>
+            </tr>
+            <tr>
+              <td>Tridagon</td>
+              <td>
+                Three digits cycling across four cells in one shape
+                cannot all survive; something must break.
+              </td>
+            </tr>
+            <tr>
+              <td>Oddagons</td>
+              <td>
+                Odd-length rings of strong links prove one of their
+                candidates true, killing what it sees.
+              </td>
+            </tr>
+            <tr>
+              <td>Whips and Braids</td>
+              <td>
+                Generalized chains with memory — each link remembers
+                and re-checks everything before it.
+              </td>
+            </tr>
+            <tr>
+              <td>Forcing nets</td>
+              <td>
+                Every candidate is assumed at once, and the surviving
+                conclusions are read off the grid.
+              </td>
+            </tr>
+            <tr>
+              <td>Templates</td>
+              <td>
+                The full legal footprint of one digit, intersected
+                down until it forces itself.
+              </td>
+            </tr>
+            <tr>
+              <td>Kraken fish</td>
+              <td>
+                A fish whose fin is not a cell but a whole chain,
+                proven true or false before the catch.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The three great references, if you want the deep versions:
+          <a href="https://www.sudokuwiki.org/strategy_families" target="_blank" rel="noopener">SudokuWiki's strategy families</a>,
+          <a href="https://hodoku.sourceforge.net/en/techniques.php" target="_blank" rel="noopener">HoDoKu's technique list</a>,
+          and <a href="https://www.sudopedia.org/wiki/Main_Page" target="_blank" rel="noopener">Sudopedia</a>.
+        </p>
+      </section>
+
+      <section data-technique="champion">
+        <h2>How champions actually solve</h2>
+        <p>
+          Here is the open secret: world-class solving is not a secret
+          fourth tier. It is chapters 01 through 03 — singles, pairs,
+          fish, wings — executed at extreme speed with near-zero
+          errors. Chains appear late and briefly.
+        </p>
+        <p>
+          The marking system with a name is <em>Snyder notation</em>,
+          after champion Thomas Snyder: within one box, pencil a digit
+          only where it is limited to exactly two cells. Corner marks
+          in a box, never full notes. The marks stay few, so scanning
+          stays fast. On genuinely hard grids even Snyder switches to
+          full notes — the system is a speed tool, not a religion.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000072000000904000000138000000000000500000000000000000000000000000000000000000000" data-cands="3:5;13:5" data-hl="3,13"></div>
+          <figcaption>
+            In this box, the digit 5 can only land in the two
+            highlighted cells. Snyder notation writes a small 5 in
+            each — nothing more, and the solver moves on.
+          </figcaption>
+        </figure>
+        <p>The habits behind the speed:</p>
+        <ul>
+          <li>
+            <strong>Pattern memory</strong> — shapes are recognized
+            whole, not searched cell by cell.
+          </li>
+          <li>
+            <strong>Cheapest-first discipline</strong> — rerun the
+            cheap ladder twice before paying for anything hard.
+          </li>
+          <li>
+            <strong>Minimal marks</strong> — every mark must earn its
+            ink; clutter slows the eye.
+          </li>
+          <li>
+            <strong>Composure</strong> — under championship pressure,
+            error recovery beats error-free fantasy.
+          </li>
+        </ul>
+        <h3>Records, as reported</h3>
+        <p>
+          Two famous times, both <em>reported</em>, not audited here:
+          Thomas Snyder solved a very easy puzzle in 1:23.93 (a
+          different class than competition grids), and Wang Shiyao
+          solved a championship-grade grid in 54.44 seconds at the
+          2018 World Sudoku and Puzzle Championship. Treat them as
+          folklore with good sources.
+        </p>
+      </section>
+
+      <section data-technique="path" data-part="try">
+        <h2>Your path from here</h2>
+        <p>
+          You have the whole ladder. What sharpens it is practice with
+          intent: play <a href="../sudoku.html">the game</a> timed
+          once you are comfortable, use the hint button to step
+          through stuck moments, and train one technique at a time.
+        </p>
+      </section>
+      <section data-part="checkpoint">
+        <h2>The end-of-ladder checkpoint</h2>
+        <p>Three last questions, and then the map is yours:</p>
+        <ol>
+          <li>Name any three techniques from the Tier 5 table.</li>
+          <li>Explain Snyder notation in one sentence to a friend.</li>
+          <li>Say what champions rely on most — and why it is not a
+          secret tier.</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer data-part="footer">
+      <p>
+        <a href="04-advanced.html">&#9664; Chapter 04</a> &middot;
+        <a href="index.html">All chapters</a> &middot;
+        You have reached the end of the ladder &middot;
+        <a href="../sudoku.html">Play the game</a>
+      </p>
+    </footer>
+
+    <script src="board.js"></script>
+  </body>
+</html>
