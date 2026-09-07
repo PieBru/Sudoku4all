@@ -34,8 +34,15 @@ PAGE_RULES = {
             "two_string_kite",
             "turbot_fish",
             "finned_fish",
+            "xy_wing",
+            "w_wing",
+            "uniqueness",
+            "bug",
+            "sue_de_coq",
+            "remote_pairs",
         ],
         "full_boards_min": 0,
+        "banned": ["part 1"],
     },
 }
 fails = []
@@ -147,6 +154,7 @@ built = {p.name[:2] for p in pages if re.match(r"\d\d-", p.name)}
 
 for page in pages:
     c = parse_page(page)
+    text = page.read_text(encoding="utf-8")
     for href in c.hrefs:
         if re.match(r"^(https?:|#|mailto:)", href):
             continue
@@ -171,6 +179,12 @@ for page in pages:
                 f"full-position boards >= {rule['full_boards_min']} [{page.name}]",
                 full >= rule["full_boards_min"],
                 f"full={full}",
+            )
+            hits = [b for b in rule.get("banned", []) if b in text]
+            check(
+                f"banned strings absent [{page.name}]",
+                not hits,
+                f"found={hits}",
             )
     for cls, a in c.boards:
         if "mini" in cls.split():

@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chapter 03 — Fish and single-digit patterns (part 1)</title>
+    <title>Chapter 03 — Fish, wings and uniqueness</title>
     <link rel="stylesheet" href="lesson.css" />
   </head>
   <body>
     <a class="back" href="index.html">&#9664; All chapters</a>
     <header>
-      <h1>Chapter 03 &middot; Funny patterns</h1>
+      <h1>Chapter 03 — Fish, wings and uniqueness</h1>
       <p class="sub">Part 1 of 2 &mdash; fish and single-digit patterns. Part 2 adds wings and friends.</p>
     </header>
 
@@ -193,35 +193,214 @@
           the references in chapter 05 when a puzzle truly demands one.
         </p>
       </section>
+
+      <section data-technique="xy_wing">
+        <h2>Wings I: the XY-Wing</h2>
+        <p>
+          A <em>wing</em> is three cells that gang up on a fourth. The
+          <em>XY-Wing</em> needs a <em>hinge</em> holding exactly two
+          candidates, say 3 and 8, plus two <em>pincers</em>.
+          Each pincer sees the hinge and holds one hinge digit plus a
+          shared extra digit — here 5.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000000000309004172000060000080406000900000017046005000020000000000020000000000000" data-cands="37:35;40:38;13:58;10:5" data-hl="37,40,13" data-hx="10"></div>
+          <figcaption>
+            The hinge r5c5 holds 3/8; pincers r5c2 holds 3/5 and r2c5
+            holds 5/8. Whatever the hinge becomes, one pincer turns 5.
+            So r2c2 — which sees both pincers — loses the 5.
+          </figcaption>
+        </figure>
+        <p>
+          Why it works: the hinge is 3 or 8. If 3, the lower pincer is 5;
+          if 8, the upper pincer is 5. Either way a pincer <em>is</em> 5,
+          and any cell seeing both cannot be 5.
+        </p>
+        <p>
+          The <em>XYZ-Wing</em> is the same shape with the hinge holding
+          all three digits — here the same board minus one clue:
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000000000309004172000060000080406000900000017046000000020000000000020000000000000" data-cands="37:35;40:358;13:58;10:5" data-hl="37,40,13" data-hx="10"></div>
+          <figcaption>
+            The hinge now holds 3/5/8 — it might <em>itself</em> be the 5.
+            The crossed cell still loses 5: it sees both pincers, and one
+            of the three cells must be 5.
+          </figcaption>
+        </figure>
+        <p>
+          <em>WXYZ-Wing</em> and <em>Fireworks</em> stretch the idea to
+          four cells. Same story, bigger gang — meet them by name and
+          move on.
+        </p>
+      </section>
+
+      <section data-technique="w_wing">
+        <h2>Wings II: the W-Wing</h2>
+        <p>
+          The <em>W-Wing</em> swaps the hinge for a <em>strong link</em>:
+          two cells in one line that are the only homes of a digit there.
+          Between them sit two cells with the same pair of candidates.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="008020000000109005300070060000060020020010000000080000060050003000901500000030800" data-cands="10:47;70:47;13:4;67:4;16:478" data-hl="10,70,13,67" data-hx="16"></div>
+          <figcaption>
+            r2c2 and r8c8 both hold 4/7. In column 5, only r2c5 and r8c5
+            can hold 4 — one of them <em>is</em> 4. Whichever it is, one
+            of the two 4/7 cells becomes 7. So r2c8, seeing both, loses 7.
+          </figcaption>
+        </figure>
+        <p>
+          Read it twice: the link forces one pair-cell to 7; the pair
+          cells force each other; the victim sees both. Two same-pair
+          cells plus one tight column are the whole recipe.
+        </p>
+      </section>
+
+      <section data-technique="uniqueness">
+        <h2>Uniqueness: one answer, a promise</h2>
+        <p>
+          Every puzzle here has exactly <em>one</em> solution — the game
+          engine checks it before a board ships. That promise is a tool.
+          Some positions would allow two answers; since two are
+          forbidden, anything creating them must be wrong.
+        </p>
+        <p>
+          The simplest trap is the <em>deadly rectangle</em>: four cells
+          in a perfect rectangle, across exactly two boxes, holding the
+          same pair. Filled one way or the other, both stay legal —
+          two answers. Forbidden.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000000000800460312000000000000000000208140637000000000000000000000007000000000000" data-cands="10:59;14:59;37:59;41:59" data-hl="10,14,37,41"></div>
+          <figcaption>
+            A schematic: notes filtered to 5 and 9. Swap 5s and 9s in
+            these four cells and every row, column and box still agrees.
+            Two answers — a real puzzle can never allow it.
+          </figcaption>
+        </figure>
+        <h3>UR type 1: the escape hatch</h3>
+        <p>
+          <em>Unique Rectangle</em> (UR) type 1: three rectangle cells
+          hold only the pair, one holds an extra candidate. To dodge the
+          deadly rectangle, the extra candidate must be true.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000000000800460312000000000000000000208140637000000000000000000000007000000000000" data-cands="10:579;14:59;37:59;41:59" data-hl="10,14,37,41"></div>
+          <figcaption>
+            Same rectangle as above. r2c2 has a third way out: 7. If the
+            7 were wrong, the four cells fall into the deadly swap. So
+            r2c2 <em>is</em> 7 — place it with confidence.
+          </figcaption>
+        </figure>
+        <p>
+          The family grows by moving the escape around. One line each:
+        </p>
+        <ul>
+          <li><strong>UR type 2</strong> — the extra cell pairs with a fifth cell; one of the two is the extra digit, so cells seeing both lose it.</li>
+          <li><strong>UR type 3</strong> — the extra candidates join a nearby subset, like a phantom naked pair.</li>
+          <li><strong>UR type 4</strong> — a strong link on one pair digit keeps it alive in the extra cell; the other digit there dies.</li>
+          <li><strong>UR type 5</strong> — three cells carry the extra digit; cells seeing all three lose it.</li>
+          <li><strong>UR type 6</strong> — the rectangle sits on two strong links; only one diagonal pairing survives.</li>
+          <li><strong>Hidden UR</strong> — strong links on both digits squeeze the rectangle from outside.</li>
+          <li><strong>Avoidable Rectangle</strong> — same trap, but built from digits <em>you</em> placed, not printed clues.</li>
+        </ul>
+      </section>
+
+      <section data-technique="bug">
+        <h2>BUG+1: the grave</h2>
+        <p>
+          <em>BUG</em> stands for Bivalue Universal Grave — a board
+          where every unsolved cell holds exactly two candidates and
+          every digit pairs off. That shape always has two answers, so
+          it can never occur in a fair puzzle.
+        </p>
+        <p>
+          <em>BUG+1</em> is the grave plus one survivor: a single cell
+          with three candidates. Look again at the UR board above for
+          the face of it: pair cells everywhere, one cell with an extra
+          digit. The rule is one sentence — in the three-candidate
+          cell, keep only the digit that appears three times in its
+          row, column and box combined; the puzzle is trying to trap
+          itself into the grave otherwise. Rare, strange, delightful.
+        </p>
+      </section>
+
+      <section data-technique="sue_de_coq">
+        <h2>Sue de Coq: the rare bird</h2>
+        <p>
+          <em>Sue de Coq</em> — named after its finder — is a locked
+          handshake between a row and a box. Two intersection cells
+          hold four digits between them; a row cell and a box cell
+          each hold two of those digits. Together the four cells
+          consume exactly four digits.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="000507000506000708080960000000132000000040010000000040000203090000000000000000000" data-cands="12:34;13:12;16:23;23:14;10:23;14:14" data-hl="12,13,16,23" data-hx="10,14"></div>
+          <figcaption>
+            Row 2 meets its box. r2c4 holds 3/4, r2c5 holds 1/2, r2c8
+            holds 2/3, r3c6 holds 1/4 — digits 1, 2, 3, 4, each exactly
+            twice. Row cells outside lose 2/3; box cells outside lose
+            1/4.
+          </figcaption>
+        </figure>
+        <p>
+          Honestly rare: most solvers meet a handful per year. Knowing
+          the name is enough; the references in chapter 05 show more.
+        </p>
+      </section>
+
+      <section data-technique="remote_pairs">
+        <h2>Remote pairs: a chain of twins</h2>
+        <p>
+          A <em>remote pair</em> is a string of cells all holding the
+          same two digits, each cell seeing the next. Neighbours must
+          differ; cells an even number of steps apart must match.
+        </p>
+        <figure>
+          <div class="board" data-fragment data-givens="034000000617000000820000000300000000100674208402000300008000000000000000000000000" data-cands="0:59;20:59;38:59;43:59;7:59" data-hl="0,20,38,43" data-hx="7"></div>
+          <figcaption>
+            Four cells hold 5/9 in a chain: r1c1 to r3c3 (box), r3c3 to
+            r5c3 (column), r5c3 to r5c8 (row). The ends are three steps
+            apart — odd — so one end is 5 and the other is 9. r1c8,
+            seeing both ends, loses both digits.
+          </figcaption>
+        </figure>
+        <p>
+          Counting steps is the whole skill. Odd distance apart means
+          opposite digits; any cell seeing both ends of an odd stretch
+          loses the pair.
+        </p>
+      </section>
     </section>
 
     <section data-part="try">
       <h2>Try it in the game</h2>
       <p>
-        <a href="../sudoku.html">Open the game</a>, set difficulty to Hard,
-        and press New game. Hunt with one digit at a time: pick a digit,
-        note where it can go in each row and column, and look for a
-        rectangle. Even one found X-Wing pays for the whole search.
+        <a href="../sudoku.html">Open the game</a>, set difficulty to
+        Expert, and press New game. Hunt a wing before anything harder:
+        scan for two-digit cells, then check whether one of them hinges
+        two others. One found wing saves minutes of staring.
       </p>
     </section>
 
     <section data-part="checkpoint">
-      <h2>Checkpoint (part 1)</h2>
-      <p>Can you do these three things?</p>
+      <h2>Checkpoint</h2>
+      <p>You graduate from chapter 03 when you can do all of these:</p>
       <ol>
         <li>
-          On the X-Wing board above, point at the four rectangle cells and
-          say which columns get cleaned.
+          On the X-Wing board, point at the four rectangle cells and say
+          which columns get cleaned.
         </li>
         <li>
-          On the skyscraper board, name the base, the two tips, and why the
-          crossed cells must go.
+          On the UR type 1 board, say which cell must take its extra
+          candidate — and why the deadly rectangle forbids the pair.
         </li>
         <li>
-          Say what changes for the eliminations when a fish grows a fin.
+          Name the three cells of the XY-Wing board and why the crossed 5
+          must go.
         </li>
       </ol>
-      <p>Part 2 of this chapter adds wings and the uniqueness family.</p>
     </section>
 
     <footer data-part="footer">

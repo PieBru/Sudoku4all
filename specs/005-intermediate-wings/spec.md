@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal.md §3 (chapter 03 row), §4 (L3, L6), §5 (row `005-intermediate-wings`), §5.1, §7; Brief §Tier 3 (wings, uniqueness family, miscellaneous)
 
