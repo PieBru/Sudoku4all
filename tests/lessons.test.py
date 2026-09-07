@@ -26,6 +26,17 @@ PAGE_RULES = {
         "techniques": ["naked_pair", "hidden_pair", "pointing", "claiming"],
         "full_boards_min": 0,
     },
+    "03-intermediate.html": {
+        "techniques": [
+            "x_wing",
+            "swordfish",
+            "skyscraper",
+            "two_string_kite",
+            "turbot_fish",
+            "finned_fish",
+        ],
+        "full_boards_min": 0,
+    },
 }
 fails = []
 

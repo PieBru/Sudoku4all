@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chapter 03 — Fish and single-digit patterns (part 1)</title>
+    <link rel="stylesheet" href="lesson.css" />
+  </head>
+  <body>
+    <a class="back" href="index.html">&#9664; All chapters</a>
+    <header>
+      <h1>Chapter 03 &middot; Funny patterns</h1>
+      <p class="sub">Part 1 of 2 &mdash; fish and single-digit patterns. Part 2 adds wings and friends.</p>
+    </header>
+
+    <nav data-part="ladder" aria-label="Chapters">
+      <ol>
+        <li>00 Hello!</li>
+        <li>01 First tricks</li>
+        <li>02 Pairs</li>
+        <li class="here">03 Funny patterns</li>
+        <li>04 Deep logic</li>
+        <li>05 The map</li>
+      </ol>
+    </nav>
+
+    <section data-part="learn">
+      <h2>What you will learn</h2>
+      <p>
+        This chapter expects chapter 02: you read candidate notes comfortably
+        and know pointing and claiming. Here you follow <em>one digit</em>
+        across the whole board. Two families reward that focus: fish, which
+        trap a digit inside a rectangle of rows and columns, and
+        single-digit patterns, which chain two such traps together.
+      </p>
+    </section>
+
+    <section data-part="body">
+      <section data-technique="x_wing">
+        <h2>X-Wing</h2>
+        <p>
+          Pick a digit. In two different rows, suppose its candidates sit in
+          exactly the same two columns. Those four cells form a rectangle —
+          an <em>X-Wing</em>. The digit must occupy two diagonal corners, so
+          those two columns are fully served: every other candidate of that
+          digit in both columns can go.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000790250186000000040000000000000000000000000004360810529000000000000000000"
+            data-cands="11:4;14:4;56:4;59:4;29:4;41:4;65:4;77:4"
+            data-hl="11,14,56,59"
+            data-hx="29,41,65,77"
+            role="img"
+            aria-label="Board fragment: digit 4 forms an X-Wing rectangle on rows two and seven, columns three and six; four other 4 candidates in those columns are crossed out"
+          ></div>
+          <figcaption>
+            A teaching fragment, digit 4. Rows 2 and 7 hold their 4s in
+            columns 3 and 6 — a rectangle. Every crossed 4 outside the
+            rectangle in those columns must go.
+          </figcaption>
+        </figure>
+        <p>
+          Swap the words rows and columns and the trick still works: two
+          columns locking the same two rows.
+        </p>
+      </section>
+
+      <section data-technique="swordfish">
+        <h2>Swordfish</h2>
+        <p>
+          The same idea with three rows instead of two. In three rows, the
+          digit's candidates all sit inside the same three columns — a
+          <em>Swordfish</em>. The three corners feed those columns, so all
+          other candidates of the digit in the three columns go. Each row may
+          use only two of the columns; three is the ceiling.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000031409680000000070000000000465801390000000000000000000094285130000000000"
+            data-cands="9:7;13:7;40:7;44:7;63:7;71:7;0:7;31:7;54:7;76:7"
+            data-hl="9,13,40,44,63,71"
+            data-hx="0,31,54,76"
+            role="img"
+            aria-label="Board fragment: digit 7 forms a swordfish across rows two, five and eight using columns one, five and nine; four other 7 candidates in those columns are crossed out"
+          ></div>
+          <figcaption>
+            A teaching fragment, digit 7. Rows 2, 5 and 8 trap the 7s inside
+            columns 1, 5 and 9 — so the crossed 7s in those columns must go.
+          </figcaption>
+        </figure>
+        <p>
+          A <em>Jellyfish</em> is the four-row version. It exists, it is
+          legal, and it is rarer than patience — most solvers meet one or two
+          in a lifetime. X-Wing, Swordfish, Jellyfish: two rows, three rows,
+          four rows; one family.
+        </p>
+      </section>
+
+      <section data-technique="skyscraper">
+        <h2>Skyscraper</h2>
+        <p>
+          Single-digit patterns use two parallel lines. A
+          <em>Skyscraper</em> is two columns where the digit has exactly two
+          candidates each, and one pair sits in the same row — the base.
+          The other two cells are the tips. Any cell seeing both tips can
+          drop the digit.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000000000010040000020030000030020000000090000040000000050010000070080000080050000"
+            data-cands="1:6;37:6;4:6;49:6;39:6;41:6"
+            data-hl="1,37,4,49"
+            data-hx="39,41"
+            role="img"
+            aria-label="Board fragment: digit 6 forms a skyscraper on columns two and five with base row one; two 6 candidates that see both tips are crossed out"
+          ></div>
+          <figcaption>
+            A teaching fragment, digit 6. Columns 2 and 5 each hold two 6s;
+            the base pair lies in row 1. The crossed 6s see both tips, so
+            they must go.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section data-technique="two_string_kite">
+        <h2>2-String Kite</h2>
+        <p>
+          A <em>2-String Kite</em> bends the two lines: one string runs
+          along a row, one down a column, and they meet inside a box that
+          holds exactly two candidates of the digit. Each string has exactly
+          one candidate outside the box. The two far ends see each other —
+          or both see one common cell — and that cell drops the digit.
+        </p>
+        <figure>
+          <div
+            class="board"
+            data-fragment
+            data-givens="000007000000004300000009000625081904300792000000540000000005000000000000000008000"
+            data-cands="30:3;50:3;34:3;68:3;70:3"
+            data-hl="30,50,34,68"
+            data-hx="70"
+            role="img"
+            aria-label="Board fragment: digit 3 forms a 2-string kite: row four and column six meet in the centre box, and the far-end cell r8c8 loses its 3"
+          ></div>
+          <figcaption>
+            A teaching fragment, digit 3. Row 4 and column 6 hold their 3s
+            in pairs, meeting in the center box. The far ends both see the
+            crossed cell — its 3 must go.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section data-technique="turbot_fish">
+        <h2>Turbot fish</h2>
+        <p>
+          A <em>Turbot fish</em> is the general shape behind all of these:
+          any chain of alternating strong and weak links on a single digit,
+          closed by two strong links whose ends overlap. The skyscraper and
+          the 2-string kite are its two most common costumes. Finding one is
+          the skill; naming it is bookkeeping.
+        </p>
+        <p>
+          Related, and worth a name-check: the <em>Empty Rectangle</em>
+          combines a bi-value line with a box whose candidates line up
+          neatly. It works, but a canonical school deprecates it as
+          redundant — other patterns find the same eliminations. Meet it
+          again in the wild before investing practice.
+        </p>
+      </section>
+
+      <section data-technique="finned_fish">
+        <h2>Finned fish, and the stranger seas</h2>
+        <p>
+          Sometimes a fish is perfect except one extra candidate clinging to
+          a corner — a <em>fin</em>. A <em>finned fish</em> keeps almost the
+          old eliminations: everything that sees the fin cell still goes. A
+          <em>sashimi fish</em> is the finned cousin whose corner cell
+          itself is missing. Take the X-Wing board above and imagine a
+          stray 4 highlighted beside a corner: the crossed 4s seeing that
+          stray cell still go, the others are off.
+        </p>
+        <p>
+          Two more names, no tutorials: <em>franken fish</em> mix rows,
+          columns and boxes as their lines; <em>mutant fish</em> use only
+          boxes and diagonals of boxes. They exist for completeness — see
+          the references in chapter 05 when a puzzle truly demands one.
+        </p>
+      </section>
+    </section>
+
+    <section data-part="try">
+      <h2>Try it in the game</h2>
+      <p>
+        <a href="../sudoku.html">Open the game</a>, set difficulty to Hard,
+        and press New game. Hunt with one digit at a time: pick a digit,
+        note where it can go in each row and column, and look for a
+        rectangle. Even one found X-Wing pays for the whole search.
+      </p>
+    </section>
+
+    <section data-part="checkpoint">
+      <h2>Checkpoint (part 1)</h2>
+      <p>Can you do these three things?</p>
+      <ol>
+        <li>
+          On the X-Wing board above, point at the four rectangle cells and
+          say which columns get cleaned.
+        </li>
+        <li>
+          On the skyscraper board, name the base, the two tips, and why the
+          crossed cells must go.
+        </li>
+        <li>
+          Say what changes for the eliminations when a fish grows a fin.
+        </li>
+      </ol>
+      <p>Part 2 of this chapter adds wings and the uniqueness family.</p>
+    </section>
+
+    <footer data-part="footer">
+      <p>
+        <a href="02-basic.html">&#9664; Chapter 02</a> &middot;
+        <a href="index.html">All chapters</a> &middot; Chapter 04 is coming
+        soon &middot; <a href="../sudoku.html">Play the game</a>
+      </p>
+    </footer>
+
+    <script src="board.js"></script>
+  </body>
+</html>
