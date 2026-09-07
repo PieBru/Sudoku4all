@@ -1,0 +1,5 @@
+# local test-env / tooling artifacts — not source
+.venv/
+.pytest_cache/
+.ruff_cache/
+.playwright-cli/

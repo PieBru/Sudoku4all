@@ -1,0 +1,7 @@
+[project]
+# Test-gate env for the Sudoku app (sudoku.html itself is dependency-free).
+# Run gates: node tests/engine.test.mjs ; uv run python tests/browser.test.py
+name = "sudoku-tests"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["playwright"]
