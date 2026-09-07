@@ -653,6 +653,383 @@
         return countSolutions(puz, 2) === 1;
       }
 
+      /* ============ Training solver (spec 009) — pure logic, no DOM ============ */
+      /* Deterministic technique solver: detectors cheapest-first, each returns
+         null or a sound action. No randomness anywhere (FR-007). */
+      const TRAIN_TECHNIQUES = [
+        "naked_single", "hidden_single",
+        "naked_pair", "naked_triple", "naked_quad",
+        "hidden_pair", "hidden_triple", "hidden_quad",
+        "pointing", "claiming",
+        "x_wing", "swordfish", "jellyfish",
+        "skyscraper", "two_string_kite", "turbot_fish",
+        "xy_wing", "xyz_wing", "w_wing",
+      ];
+      const tBit = (d) => 1 << (d - 1);
+      const tDigits = (m) => { const a = []; for (let d = 1; d <= 9; d++) if (m & tBit(d)) a.push(d); return a; };
+      const SEE = (() => {
+        const s = Array.from({ length: N }, () => new Set());
+        for (const u of GROUPS)
+          for (const a of u) for (const b of u) if (a !== b) s[a].add(b);
+        return s.map((x) => [...x]);
+      })();
+      const sees = (a, b) => SEE[a].includes(b);
+      const tCombs = (arr, k) => {
+        const out = [];
+        const rec = (start, cur) => {
+          if (cur.length === k) { out.push(cur.slice()); return; }
+          for (let i = start; i < arr.length; i++) { cur.push(arr[i]); rec(i + 1, cur); cur.pop(); }
+        };
+        rec(0, []);
+        return out;
+      };
+      const trainCands = (bd) => {
+        const c = new Array(N).fill(0);
+        for (let i = 0; i < N; i++) {
+          if (bd[i]) continue;
+          let m = 0;
+          for (let d = 1; d <= 9; d++) if (SEE[i].every((j) => bd[j] !== d)) m |= tBit(d);
+          c[i] = m;
+        }
+        return c;
+      };
+
+      /* singles */
+      const detNakedSingle = (cand, bd) => {
+        for (let i = 0; i < N; i++)
+          if (!bd[i] && cand[i] && !(cand[i] & (cand[i] - 1)))
+            return { place: [i, Math.log2(cand[i]) + 1] };
+        return null;
+      };
+      const detHiddenSingle = (cand, bd) => {
+        for (const u of GROUPS)
+          for (let d = 1; d <= 9; d++) {
+            if (u.some((i) => bd[i] === d)) continue;
+            const spots = u.filter((i) => !bd[i] && cand[i] & tBit(d));
+            if (spots.length === 1) return { place: [spots[0], d] };
+          }
+        return null;
+      };
+
+      /* naked / hidden subsets (k = 2..4) */
+      const nakedSubset = (k) => (cand, bd) => {
+        for (const u of GROUPS) {
+          const open = u.filter((i) => !bd[i]);
+          for (const combo of tCombs(open, k)) {
+            let m = 0;
+            for (const i of combo) m |= cand[i];
+            if (tDigits(m).length !== k) continue;
+            const elims = [];
+            for (const i of open)
+              if (!combo.includes(i) && cand[i] & m) elims.push([i, cand[i] & m]);
+            if (elims.length) return { elims };
+          }
+        }
+        return null;
+      };
+      const hiddenSubset = (k) => (cand, bd) => {
+        for (const u of GROUPS) {
+          const open = u.filter((i) => !bd[i]);
+          let free = 0;
+          for (const i of open) free |= cand[i];
+          for (const combo of tCombs(tDigits(free), k)) {
+            let dm = 0;
+            for (const d of combo) dm |= tBit(d);
+            const spots = open.filter((i) => cand[i] & dm);
+            if (spots.length !== k) continue;
+            const elims = [];
+            for (const i of spots)
+              if (cand[i] & ~dm) elims.push([i, cand[i] & ~dm]);
+            if (elims.length) return { elims };
+          }
+        }
+        return null;
+      };
+
+      /* box/line intersections */
+      const detPointing = (cand, bd) => {
+        for (let b = 0; b < 9; b++) {
+          const box = GROUPS[18 + b];
+          for (let d = 1; d <= 9; d++) {
+            const spots = box.filter((i) => !bd[i] && cand[i] & tBit(d));
+            if (spots.length < 2) continue;
+            const rows = new Set(spots.map((i) => (i / 9) | 0));
+            const cols = new Set(spots.map((i) => i % 9));
+            const elims = [];
+            if (rows.size === 1) {
+              const r = [...rows][0];
+              for (let c = 0; c < 9; c++) {
+                const i = r * 9 + c;
+                if (!bd[i] && cand[i] & tBit(d) && !box.includes(i)) elims.push([i, tBit(d)]);
+              }
+            } else if (cols.size === 1) {
+              const c0 = [...cols][0];
+              for (let r = 0; r < 9; r++) {
+                const i = r * 9 + c0;
+                if (!bd[i] && cand[i] & tBit(d) && !box.includes(i)) elims.push([i, tBit(d)]);
+              }
+            }
+            if (elims.length) return { elims };
+          }
+        }
+        return null;
+      };
+      const detClaiming = (cand, bd) => {
+        for (let li = 0; li < 18; li++) {
+          const line = GROUPS[li];
+          for (let d = 1; d <= 9; d++) {
+            const spots = line.filter((i) => !bd[i] && cand[i] & tBit(d));
+            if (spots.length < 2) continue;
+            const boxes = new Set(
+              spots.map((i) => 18 + ((((i / 9) | 0) / 3 | 0) * 3) + (((i % 9) / 3) | 0)),
+            );
+            if (boxes.size !== 1) continue;
+            const box = GROUPS[[...boxes][0]];
+            const elims = [];
+            for (const i of box)
+              if (!bd[i] && cand[i] & tBit(d) && !line.includes(i)) elims.push([i, tBit(d)]);
+            if (elims.length) return { elims };
+          }
+        }
+        return null;
+      };
+
+      /* fish (k = 2..4): rows then cols as base sets */
+      const fish = (k) => (cand, bd) => {
+        for (let d = 1; d <= 9; d++)
+          for (const axis of [0, 1]) {
+            const sets = [];
+            for (let l = 0; l < 9; l++) {
+              const cross = [];
+              for (let j = 0; j < 9; j++) {
+                const i = axis ? j * 9 + l : l * 9 + j;
+                if (!bd[i] && cand[i] & tBit(d)) cross.push(j);
+              }
+              if (cross.length >= 2 && cross.length <= k) sets.push([l, cross]);
+            }
+            for (const combo of tCombs(sets, k)) {
+              const cover = new Set();
+              for (const [, cr] of combo) for (const j of cr) cover.add(j);
+              if (cover.size !== k) continue;
+              const elims = [];
+              for (const j of cover)
+                for (let l = 0; l < 9; l++)
+                  if (!combo.some(([ll]) => ll === l)) {
+                    const i = axis ? j * 9 + l : l * 9 + j;
+                    if (!bd[i] && cand[i] & tBit(d)) elims.push([i, tBit(d)]);
+                  }
+              if (elims.length) return { elims };
+            }
+          }
+        return null;
+      };
+
+      /* single-digit two-strong-link patterns */
+      const detSkyscraper = (cand, bd) => {
+        for (let d = 1; d <= 9; d++)
+          for (const axis of [0, 1]) {
+            const links = [];
+            for (let l = 0; l < 9; l++) {
+              const spots = [];
+              for (let j = 0; j < 9; j++) {
+                const i = axis ? j * 9 + l : l * 9 + j;
+                if (!bd[i] && cand[i] & tBit(d)) spots.push(i);
+              }
+              if (spots.length === 2) links.push(spots);
+            }
+            for (const [A, B] of tCombs(links, 2))
+              for (const [i1, i2] of [[0, 0], [0, 1], [1, 0], [1, 1]]) {
+                const base1 = A[i1], tip1 = A[1 - i1], base2 = B[i2], tip2 = B[1 - i2];
+                if (base1 === base2 || tip1 === tip2 || sees(tip1, tip2)) continue;
+                if (!sees(base1, base2)) continue;
+                const elims = [];
+                for (let i = 0; i < N; i++)
+                  if (!bd[i] && i !== tip1 && i !== tip2 && cand[i] & tBit(d) && sees(i, tip1) && sees(i, tip2))
+                    elims.push([i, tBit(d)]);
+                if (elims.length) return { elims };
+              }
+          }
+        return null;
+      };
+      const detTwoStringKite = (cand, bd) => {
+        for (let d = 1; d <= 9; d++) {
+          const rowLinks = [], colLinks = [];
+          for (let l = 0; l < 9; l++) {
+            const rSpots = [], cSpots = [];
+            for (let j = 0; j < 9; j++) {
+              const ri = l * 9 + j, ci = j * 9 + l;
+              if (!bd[ri] && cand[ri] & tBit(d)) rSpots.push(ri);
+              if (!bd[ci] && cand[ci] & tBit(d)) cSpots.push(ci);
+            }
+            if (rSpots.length === 2) rowLinks.push(rSpots);
+            if (cSpots.length === 2) colLinks.push(cSpots);
+          }
+          for (const R of rowLinks)
+            for (const C of colLinks)
+              for (const [i1, i2] of [[0, 0], [0, 1], [1, 0], [1, 1]]) {
+                const rc = R[i1], rEnd = R[1 - i1], cc = C[i2], cEnd = C[1 - i2];
+                if (rc === cc || rEnd === cEnd) continue;
+                if (!sees(rc, cc)) continue;
+                const elims = [];
+                for (let i = 0; i < N; i++)
+                  if (!bd[i] && i !== rEnd && i !== cEnd && cand[i] & tBit(d) && sees(i, rEnd) && sees(i, cEnd))
+                    elims.push([i, tBit(d)]);
+                if (elims.length) return { elims };
+              }
+        }
+        return null;
+      };
+      const detTurbotFish = (cand, bd) => {
+        for (let d = 1; d <= 9; d++) {
+          const links = [];
+          for (const u of GROUPS) {
+            const spots = u.filter((i) => !bd[i] && cand[i] & tBit(d));
+            if (spots.length === 2) links.push(spots);
+          }
+          for (const [L1, L2] of tCombs(links, 2))
+            for (const p2 of L1)
+              for (const q2 of L2) {
+                if (p2 === q2 || !sees(p2, q2)) continue;
+                const p1 = L1[0] === p2 ? L1[1] : L1[0];
+                const q1 = L2[0] === q2 ? L2[1] : L2[0];
+                if (p1 === q1) continue;
+                const elims = [];
+                for (let i = 0; i < N; i++)
+                  if (!bd[i] && i !== p1 && i !== q1 && cand[i] & tBit(d) && sees(i, p1) && sees(i, q1))
+                    elims.push([i, tBit(d)]);
+                if (elims.length) return { elims };
+              }
+        }
+        return null;
+      };
+
+      /* wings */
+      const detXYWing = (cand, bd) => {
+        for (let p = 0; p < N; p++) {
+          if (bd[p] || tDigits(cand[p]).length !== 2) continue;
+          for (const q of SEE[p]) {
+            if (bd[q] || q === p || tDigits(cand[q]).length !== 2) continue;
+            const shareQ = cand[p] & cand[q];
+            if (tDigits(shareQ).length !== 1) continue;
+            for (const r of SEE[p]) {
+              if (r === q || r === p || bd[r] || tDigits(cand[r]).length !== 2) continue;
+              const shareR = cand[p] & cand[r];
+              if (tDigits(shareR).length !== 1 || shareR === shareQ) continue;
+              const zq = tDigits(cand[q] & ~shareQ)[0];
+              const zr = tDigits(cand[r] & ~shareR)[0];
+              if (zq !== zr) continue;
+              const elims = [];
+              for (let i = 0; i < N; i++)
+                if (!bd[i] && i !== p && i !== q && i !== r && cand[i] & tBit(zq) && sees(i, q) && sees(i, r))
+                  elims.push([i, tBit(zq)]);
+              if (elims.length) return { elims };
+            }
+          }
+        }
+        return null;
+      };
+      const detXYZWing = (cand, bd) => {
+        for (let p = 0; p < N; p++) {
+          if (bd[p] || tDigits(cand[p]).length !== 3) continue;
+          const ds = tDigits(cand[p]);
+          for (const z of ds) {
+            const pincers = [];
+            for (const j of SEE[p]) {
+              if (bd[j] || j === p || tDigits(cand[j]).length !== 2) continue;
+              if (cand[j] & ~cand[p]) continue;
+              if (!(cand[j] & tBit(z))) continue;
+              pincers.push(j);
+            }
+            for (const [q, r] of tCombs(pincers, 2)) {
+              if ((cand[q] | cand[r]) !== cand[p]) continue;
+              const elims = [];
+              for (let i = 0; i < N; i++)
+                if (!bd[i] && i !== p && i !== q && i !== r && cand[i] & tBit(z) && sees(i, p) && sees(i, q) && sees(i, r))
+                  elims.push([i, tBit(z)]);
+              if (elims.length) return { elims };
+            }
+          }
+        }
+        return null;
+      };
+      const detWWing = (cand, bd) => {
+        const bivals = [];
+        for (let i = 0; i < N; i++) if (!bd[i] && tDigits(cand[i]).length === 2) bivals.push(i);
+        for (const [A, B] of tCombs(bivals, 2)) {
+          if (cand[A] !== cand[B]) continue;
+          const [d1, d2] = tDigits(cand[A]);
+          for (const ld of [d1, d2]) {
+            const el = ld === d1 ? d2 : d1;
+            for (const u of GROUPS) {
+              const spots = u.filter((i) => !bd[i] && cand[i] & tBit(ld));
+              if (spots.length !== 2) continue;
+              const [a, b] = spots;
+              if (a === A || a === B || b === A || b === B) continue;
+              const ok1 = sees(a, A) && sees(b, B);
+              const ok2 = sees(a, B) && sees(b, A);
+              if (!ok1 && !ok2) continue;
+              const elims = [];
+              for (let i = 0; i < N; i++)
+                if (!bd[i] && i !== A && i !== B && cand[i] & tBit(el) && sees(i, A) && sees(i, B))
+                  elims.push([i, tBit(el)]);
+              if (elims.length) return { elims };
+            }
+          }
+        }
+        return null;
+      };
+
+      const trainDetectors = {
+        naked_single: detNakedSingle, hidden_single: detHiddenSingle,
+        naked_pair: nakedSubset(2), naked_triple: nakedSubset(3), naked_quad: nakedSubset(4),
+        hidden_pair: hiddenSubset(2), hidden_triple: hiddenSubset(3), hidden_quad: hiddenSubset(4),
+        pointing: detPointing, claiming: detClaiming,
+        x_wing: fish(2), swordfish: fish(3), jellyfish: fish(4),
+        skyscraper: detSkyscraper, two_string_kite: detTwoStringKite, turbot_fish: detTurbotFish,
+        xy_wing: detXYWing, xyz_wing: detXYZWing, w_wing: detWWing,
+      };
+      function solveWithAllowed(board, allowedIds) {
+        const t0 = Date.now();
+        const bd = board.slice();
+        const allowed = TRAIN_TECHNIQUES.filter((t) => allowedIds.includes(t));
+        const used = [];
+        let rounds = 0, placements = 0, elimRounds = 0, timeout = false;
+        const cand = trainCands(bd);
+        const applyPlace = (i, d) => {
+          bd[i] = d; cand[i] = 0; placements++;
+          for (const j of SEE[i]) cand[j] &= ~tBit(d);
+        };
+        while (bd.some((v) => !v)) {
+          if (Date.now() - t0 > 500) { timeout = true; break; }
+          if (placements > 81) break;
+          const before = placements;
+          let acted = false;
+          for (const t of allowed) {
+            const act = trainDetectors[t](cand, bd);
+            if (!act) continue;
+            if (act.place) {
+              applyPlace(act.place[0], act.place[1]);
+              if (!used.includes(t)) used.push(t);
+              acted = true;
+              break;
+            }
+            if (!act.elims.some(([i, m]) => cand[i] & m)) continue; /* no-op firing */
+            for (const [i, m] of act.elims) cand[i] &= ~m;
+            if (!used.includes(t)) used.push(t);
+            acted = true;
+            break;
+          }
+          rounds++;
+          if (!acted) break; /* honest stuck: full pass, nothing changed */
+          if (placements === before) { elimRounds++; if (elimRounds > 200) break; }
+          else elimRounds = 0;
+        }
+        return {
+          completed: !bd.some((v) => !v) && !timeout,
+          board: bd, used, rounds, timeout,
+        };
+      }
+
       /* ================= DOM / UI ================= */
       if (typeof document !== "undefined" && document.getElementById("grid"))
         (function () {

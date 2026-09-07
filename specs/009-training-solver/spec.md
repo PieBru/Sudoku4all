@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-07
 
-**Status**: Draft
+**Status**: Done
 
 **Input**: specs/proposal-training.md §3 (feasibility ladder + soundness honesty), §4 (levels, Appendix A checklist), §5 (`solveWithAllowed`), §8 (Training-engine gate, solver half; sabotage culture), Appendix C skeleton
 
